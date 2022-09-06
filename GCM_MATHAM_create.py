@@ -6,6 +6,9 @@ master_GCM_dir = '/home/palatyle/LMD_gen/trunk/test_run/'
 cold_dry_dir = '/home/palatyle/LMD_gen/trunk/cold_dry/'
 warm_wet_dir = '/home/palatyle/LMD_gen/trunk/warm_wet/'
 MATHAM_dir = '/home/palatyle/m-atham/'
+outer_pbs_dir = '/home/palatyle/LMD_MATHAM_Utils/'
+domain_flux_dir = '/home/palatyle/LMD_MATHAM_Utils/MATHAM_run.py'
+GCM_datadir = '/home/palatyle/LMD_gen/trunk/datagcm'
 # Volcano names filename
 volc_fn = '/home/palatyle/GCM2MATHAM/Mars_Volc_locs.csv'
 
@@ -33,14 +36,11 @@ for volc_name in volc_df['Volcano Name']:
         # Edit output dir line
         callphys_def[21] = "output_dir = /scratch/palatyle/" + volc_name + "_" + atmos + "/" + "diagfi.nc\n"
         # Edit volcano name line
-        callphys_def[46] = "volc_name="+volc_name+"\n"
+        callphys_def[46] = "volc_name=" + volc_name + "\n"
 
         # Edit atmosphere type line
-        if atmos == "cold_dry":
-            callphys_def[51] = "atmos_type=cd\n"
-        elif atmos == "warm_wet":
-            callphys_def[51] = "atmos_type=ww\n"
-
+        callphys_def[51] = "atmos_type=" + atmos + "\n"
+    
         # Write edited lines to file
         file = open('callphys.def','w')
         file.writelines(callphys_def)
@@ -90,15 +90,12 @@ for volc_name in volc_df['Volcano Name']:
             MATHAM_pbs[5] = "#PBS -N MATHAM_" + volc_name + "_" + atmos + "_" + season + "\n"
 
             MATHAM_exec = "/home/palatyle/m-atham/exec/atham"
-            i_flag = " -i /home/palatyle/m-atham/IO_ref"
+            
+            i_flag = " -i /home/palatyle/P_MATHAM/IO_ref"
             o_flag = " -o /scratch/palatyle/" + volc_name + "_" + atmos
             f_flag = " -f MATHAM_" + season
             a_flag = " -a INPUT_matham_setup_MATHAM_cold_dry"
-            if atmos == "cold_dry":
-                p_flag = " -p "+ volc_name + "_" + season + "_cd" 
-            elif atmos == "warm_wet":
-                p_flag = " -p "+ volc_name + "_" + season + "_ww"
-            
+            p_flag = " -p " + volc_name + "_" + season + "_" + atmos
             v_flag = " -v INPUT_volcano_MATHAM_phreato_low_MER"
             d_flag = " -d INPUT_dynamic_setup"
 
@@ -106,7 +103,18 @@ for volc_name in volc_df['Volcano Name']:
             file = open("MATHAM_"+ volc_name + "_" + atmos + "_" + season + ".pbs","w")
             file.writelines(MATHAM_pbs)
             file.close()
-        
+
+            # Domain flux pbs edit
+            shutil.copy2(os.path.join(outer_pbs_dir,'domain_flux.pbs'),current_dir+"/domain_flux_"+ volc_name + "_" + atmos + "_" + season + ".pbs")
+            file = open("domain_flux_"+ volc_name + "_" + atmos + "_" + season + ".pbs","r")
+            domain_flux_pbs = file.readlines()
+
+            domain_flux_pbs[4] = "#PBS -N domain_flux_" + volc_name + "_" + atmos + "_" + season + "\n"
+            domain_flux_pbs[18] = "python MATHAM_domain_flux.py -i /scratch/palatyle/" + volc_name + "_" + atmos + "/MATHAM_"+season+"_netCDF_MOV.nc -o " + GCM_datadir + '/' + volc_name + "_" + season + "_" + atmos +".txt\n"
+            
+            file = open("domain_flux_"+ volc_name + "_" + atmos + "_" + season + ".pbs","w")
+            file.writelines(domain_flux_pbs)
+            file.close()
         os.chdir('..')
     print(volc_name + " done!")
     os.chdir('..')
