@@ -14,4 +14,3 @@ for volc_name in volc_df['Volcano Name']:
         sp.run("qsub pbs_LMD.pbs",shell=True)
         os.chdir("..")
     os.chdir("..")
-

@@ -1,11 +1,13 @@
+from re import S
 import pandas as pd
 import os 
+import stat
 import shutil
 import glob
-master_GCM_dir = '/home/palatyle/LMD_gen/trunk/test_run/'
+master_GCM_dir = '/home/palatyle/LMD_gen/trunk/cold_dry_h2o/'
 cold_dry_dir = '/home/palatyle/LMD_gen/trunk/cold_dry/'
 warm_wet_dir = '/home/palatyle/LMD_gen/trunk/warm_wet/'
-MATHAM_dir = '/home/palatyle/m-atham/'
+MATHAM_dir = '/home/palatyle/P_MATHAM/'
 outer_pbs_dir = '/home/palatyle/LMD_MATHAM_Utils/'
 domain_flux_dir = '/home/palatyle/LMD_MATHAM_Utils/MATHAM_run.py'
 GCM_datadir = '/home/palatyle/LMD_gen/trunk/datagcm'
@@ -20,9 +22,9 @@ for volc_name in volc_df['Volcano Name']:
 
     os.chdir(volc_name)
 
-    for atmos in ["cold_dry","warm_wet"]:
-        os.mkdir(atmos)
+    for atmos in ["cold_dry"]:#,"warm_wet"]:
         os.mkdir("/scratch/palatyle/" + volc_name + "_" + atmos)
+        os.mkdir(atmos)
         os.chdir(atmos)
         current_dir = os.getcwd()
 
@@ -70,8 +72,8 @@ for volc_name in volc_df['Volcano Name']:
 
         # Copy over start files depending on relevant atmospheric scenario
         if atmos == "cold_dry":
-            shutil.copy2(os.path.join(cold_dry_dir,'start.nc'),current_dir)
-            shutil.copy2(os.path.join(cold_dry_dir,'startfi.nc'),current_dir)
+            shutil.copy2(os.path.join(cold_dry_dir,'restart.nc'),current_dir+"/start.nc")
+            shutil.copy2(os.path.join(cold_dry_dir,'restartfi.nc'),current_dir+"/startfi.nc")
         elif atmos == "warm_wet":
             shutil.copy2(os.path.join(warm_wet_dir,'start.nc'),current_dir)
             shutil.copy2(os.path.join(warm_wet_dir,'startfi.nc'),current_dir)
@@ -83,23 +85,23 @@ for volc_name in volc_df['Volcano Name']:
 
         # Copy MATHAM pbs file for each season
         for season in ["winter","spring","summer","fall"]:
-            shutil.copy2(os.path.join(MATHAM_dir,'MATHAM_cold_dry_wint_st.pbs'),current_dir+"/MATHAM_"+ volc_name + "_" + atmos + "_" + season + ".pbs")
+            shutil.copy2(os.path.join(MATHAM_dir,'Mars_test_warm_wet.pbs'),current_dir+"/MATHAM_"+ volc_name + "_" + atmos + "_" + season + ".pbs")
             file = open("MATHAM_"+ volc_name + "_" + atmos + "_" + season + ".pbs","r")
             MATHAM_pbs = file.readlines()
             
-            MATHAM_pbs[5] = "#PBS -N MATHAM_" + volc_name + "_" + atmos + "_" + season + "\n"
+            MATHAM_pbs[7] = "#PBS -N MATHAM_" + volc_name + "_" + atmos + "_" + season + "\n"
 
-            MATHAM_exec = "/home/palatyle/m-atham/exec/atham"
+            MATHAM_exec = "/home/palatyle/P_MATHAM/exec/atham"
             
             i_flag = " -i /home/palatyle/P_MATHAM/IO_ref"
             o_flag = " -o /scratch/palatyle/" + volc_name + "_" + atmos
             f_flag = " -f MATHAM_" + season
-            a_flag = " -a INPUT_matham_setup_MATHAM_cold_dry"
+            a_flag = " -a INPUT_atham_setup_Mars"
             p_flag = " -p " + volc_name + "_" + season + "_" + atmos
-            v_flag = " -v INPUT_volcano_MATHAM_phreato_low_MER"
+            v_flag = " -v INPUT_volcano_mars"
             d_flag = " -d INPUT_dynamic_setup"
 
-            MATHAM_pbs[27] = "mpirun " + MATHAM_exec + i_flag + o_flag + f_flag + a_flag + p_flag + v_flag + d_flag + "\n"
+            MATHAM_pbs[33] = "mpirun " + MATHAM_exec + i_flag + o_flag + f_flag + a_flag + p_flag + v_flag + d_flag + "\n"
             file = open("MATHAM_"+ volc_name + "_" + atmos + "_" + season + ".pbs","w")
             file.writelines(MATHAM_pbs)
             file.close()
@@ -115,6 +117,28 @@ for volc_name in volc_df['Volcano Name']:
             file = open("domain_flux_"+ volc_name + "_" + atmos + "_" + season + ".pbs","w")
             file.writelines(domain_flux_pbs)
             file.close()
+
+            # Pbs chain edits
+            if season == "winter":
+                shutil.copy2(os.path.join(outer_pbs_dir,'pbs_chain_template.sh'),current_dir+"/pbs_chain_"+ volc_name + "_" + atmos + ".sh")
+                file = open("pbs_chain_"+ volc_name + "_" + atmos + ".sh","r")
+                pbs_chain = file.readlines()
+                pbs_chain[3] = season+"=$(qsub " + "MATHAM_" + volc_name + "_" + atmos + "_" + season + ".pbs)\n"
+                pbs_chain[8] = season+"_flux=$(qsub -W depend=afterok:$" + season + " domain_flux_" + volc_name + "_" + atmos + "_" + season + ".pbs)\n"
+            elif season == "spring":
+                pbs_chain[4] = season+"=$(qsub " + "MATHAM_" + volc_name + "_" + atmos + "_" + season + ".pbs)\n"
+                pbs_chain[9] = season+"_flux=$(qsub -W depend=afterok:$" + season + " domain_flux_" + volc_name + "_" + atmos + "_" + season + ".pbs)\n"
+            elif season == "summer":
+                pbs_chain[5] = season+"=$(qsub " + "MATHAM_" + volc_name + "_" + atmos + "_" + season + ".pbs)\n"
+                pbs_chain[10] = season+"_flux=$(qsub -W depend=afterok:$" + season + " domain_flux_" + volc_name + "_" + atmos + "_" + season + ".pbs)\n"
+            elif season == "fall":
+                pbs_chain[2] = season+"=$(qsub " + "MATHAM_" + volc_name + "_" + atmos + "_" + season + ".pbs)\n"
+                pbs_chain[7] = season+"_flux=$(qsub -W depend=afterok:$" + season + " domain_flux_" + volc_name + "_" + atmos + "_" + season + ".pbs)\n"
+                pbs_chain[12] = "LMD=$(qsub -w depend=afterok:$fall_flux:$winter_flux:$spring_flux:$summer_flux pbs_LMD.pbs"
+                file = open("pbs_chain_"+ volc_name + "_" + atmos + ".sh","w")
+                file.writelines(pbs_chain)
+                file.close()
+                os.system("chmod +x "+"pbs_chain_"+ volc_name + "_" + atmos + ".sh")
         os.chdir('..')
     print(volc_name + " done!")
     os.chdir('..')
