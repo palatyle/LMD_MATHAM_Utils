@@ -112,10 +112,22 @@ for volc_name in volc_df['Volcano Name']:
             domain_flux_pbs = file.readlines()
 
             domain_flux_pbs[4] = "#PBS -N domain_flux_" + volc_name + "_" + atmos + "_" + season + "\n"
-            domain_flux_pbs[18] = "python MATHAM_domain_flux.py -i /scratch/palatyle/" + volc_name + "_" + atmos + "/MATHAM_"+season+"_netCDF_MOV.nc -o " + GCM_datadir + '/' + volc_name + "_" + season + "_" + atmos +".txt\n"
+            domain_flux_pbs[18] = "python " + outer_pbs_dir + "MATHAM_domain_flux.py -i /scratch/palatyle/" + volc_name + "_" + atmos + "/MATHAM_"+season+"_netCDF_MOV.nc -o " + GCM_datadir + '/' + volc_name + "_" + season + "_" + atmos +".txt\n"
             
             file = open("domain_flux_"+ volc_name + "_" + atmos + "_" + season + ".pbs","w")
             file.writelines(domain_flux_pbs)
+            file.close()
+
+            # nc volc filt pbs edit
+            shutil.copy2(os.path.join(outer_pbs_dir,'nc_volc_filt.pbs'),current_dir+"/nc_volc_filt_"+ volc_name + "_" + atmos + "_" + season + ".pbs")
+            file = open("nc_volc_filt_"+ volc_name + "_" + atmos + "_" + season + ".pbs","r")
+            nc_volc_filt_pbs = file.readlines()
+
+            nc_volc_filt_pbs[4] = "#PBS -N nc_volc_filt_" + volc_name + "_" + atmos + "_" + season + "\n"
+            nc_volc_filt_pbs[18] = "python " + outer_pbs_dir +  "nc_volc_filt.py -i /scratch/palatyle/" + volc_name + "_" + atmos + "/" + "diagfi.nc -o /scratch/palatyle/" + volc_name + "_" + atmos + "/" + "diagfi_volc_filt.nc\n"
+            
+            file = open("nc_volc_filt_"+ volc_name + "_" + atmos + "_" + season + ".pbs","w")
+            file.writelines(nc_volc_filt_pbs)
             file.close()
 
             # Pbs chain edits

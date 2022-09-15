@@ -117,6 +117,7 @@ def write_profiles(profile, prof_name, directory):
     filename = directory + prof_name
     with open(filename,'w') as fout:
         fout.write('{:17}    {}\n'.format('NUMBER OF MARPTS:',profile.shape[1]))
+        fout.write('\n')
         fout.write(' {:7}  {:13} {:14} {:7} {:7}\n'.format('HEIGHTS','TEMPERATURES','REL. HUMIDITY','U-WIND','V-WIND'))
         fout.write('{:>8} {:>13} {:>14} {:>7} {:>7}\n'.format('[M]','[C]','[%]','[M/S]','[M/S]'))
         fout.write('\n')
