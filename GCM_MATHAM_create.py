@@ -37,6 +37,7 @@ for volc_name in volc_df['Volcano Name']:
         callphys_def = file.readlines()
         # Edit output dir line
         callphys_def[21] = "output_dir = /scratch/palatyle/" + volc_name + "_" + atmos + "/" + "diagfi.nc\n"
+        callphys_def[24] = "callvolcano=.true."
         # Edit volcano name line
         callphys_def[46] = "volc_name=" + volc_name + "\n"
 
@@ -118,17 +119,18 @@ for volc_name in volc_df['Volcano Name']:
             file.writelines(domain_flux_pbs)
             file.close()
 
-            # nc volc filt pbs edit
-            shutil.copy2(os.path.join(outer_pbs_dir,'nc_volc_filt.pbs'),current_dir+"/nc_volc_filt_"+ volc_name + "_" + atmos + "_" + season + ".pbs")
-            file = open("nc_volc_filt_"+ volc_name + "_" + atmos + "_" + season + ".pbs","r")
-            nc_volc_filt_pbs = file.readlines()
+            # nc volc filt pbs edit. Hacky if statement to only od this once isntead of for every season
+            if season =="winter":
+                shutil.copy2(os.path.join(outer_pbs_dir,'nc_volc_filt.pbs'),current_dir+"/nc_volc_filt_"+ volc_name + "_" + atmos + ".pbs")
+                file = open("nc_volc_filt_"+ volc_name + "_" + atmos + ".pbs","r")
+                nc_volc_filt_pbs = file.readlines()
 
-            nc_volc_filt_pbs[4] = "#PBS -N nc_volc_filt_" + volc_name + "_" + atmos + "_" + season + "\n"
-            nc_volc_filt_pbs[18] = "python " + outer_pbs_dir +  "nc_volc_filt.py -i /scratch/palatyle/" + volc_name + "_" + atmos + "/" + "diagfi.nc -o /scratch/palatyle/" + volc_name + "_" + atmos + "/" + "diagfi_volc_filt.nc\n"
-            
-            file = open("nc_volc_filt_"+ volc_name + "_" + atmos + "_" + season + ".pbs","w")
-            file.writelines(nc_volc_filt_pbs)
-            file.close()
+                nc_volc_filt_pbs[4] = "#PBS -N nc_volc_filt_" + volc_name + "_" + atmos + "\n"
+                nc_volc_filt_pbs[18] = "python " + outer_pbs_dir +  "nc_volc_filt.py -i /scratch/palatyle/" + volc_name + "_" + atmos + "/" + "diagfi.nc -o /scratch/palatyle/" + volc_name + "_" + atmos + "/" + "diagfi_volc_filt.nc\n"
+                
+                file = open("nc_volc_filt_"+ volc_name + "_" + atmos + ".pbs","w")
+                file.writelines(nc_volc_filt_pbs)
+                file.close()
 
             # Pbs chain edits
             if season == "winter":
@@ -146,7 +148,8 @@ for volc_name in volc_df['Volcano Name']:
             elif season == "fall":
                 pbs_chain[2] = season+"=$(qsub " + "MATHAM_" + volc_name + "_" + atmos + "_" + season + ".pbs)\n"
                 pbs_chain[7] = season+"_flux=$(qsub -W depend=afterok:$" + season + " domain_flux_" + volc_name + "_" + atmos + "_" + season + ".pbs)\n"
-                pbs_chain[12] = "LMD=$(qsub -w depend=afterok:$fall_flux:$winter_flux:$spring_flux:$summer_flux pbs_LMD.pbs"
+                pbs_chain[12] = "LMD=$(qsub -W depend=afterok:$fall_flux:$winter_flux:$spring_flux:$summer_flux pbs_LMD.pbs)\n"
+                pbs_chain[14] = "filt=$(qsub -W depend=afterok:$LMD nc_volc_filt_" + volc_name + "_" + atmos + ".pbs)\n"
                 file = open("pbs_chain_"+ volc_name + "_" + atmos + ".sh","w")
                 file.writelines(pbs_chain)
                 file.close()
