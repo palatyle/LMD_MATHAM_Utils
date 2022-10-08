@@ -10,7 +10,7 @@ warm_wet_dir = '/home/palatyle/LMD_gen/trunk/warm_wet/'
 MATHAM_dir = '/home/palatyle/P_MATHAM/'
 outer_pbs_dir = '/home/palatyle/LMD_MATHAM_Utils/'
 domain_flux_dir = '/home/palatyle/LMD_MATHAM_Utils/MATHAM_run.py'
-GCM_datadir = '/home/palatyle/LMD_gen/trunk/datagcm'
+GCM_datadir = '/home/palatyle/LMD_gen/trunk/datadir'
 # Volcano names filename
 volc_fn = '/home/palatyle/GCM2MATHAM/Mars_Volc_locs.csv'
 
@@ -121,6 +121,9 @@ for volc_name in volc_df['Volcano Name']:
 
             # nc volc filt pbs edit. Hacky if statement to only od this once isntead of for every season
             if season =="winter":
+                os.mkdir("input")
+                shutil.copy2(MATHAM_dir +'/input/INPUT_kinetic',current_dir+"/input/INPUT_kinetic")
+
                 shutil.copy2(os.path.join(outer_pbs_dir,'nc_volc_filt.pbs'),current_dir+"/nc_volc_filt_"+ volc_name + "_" + atmos + ".pbs")
                 file = open("nc_volc_filt_"+ volc_name + "_" + atmos + ".pbs","r")
                 nc_volc_filt_pbs = file.readlines()

@@ -5,7 +5,7 @@
 #PBS -N domain_flux_Hadriaca_Patera_cold_dry_fall
 #PBS -m abe
 #PBS -M palatyle@isu.edu
-#PBS -l select=1
+#PBS -l select=1:mem=30gb
 #PBS -l walltime=00:30:00
 
 #PBS -P edu_res

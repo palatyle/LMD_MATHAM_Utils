@@ -10,4 +10,6 @@ winter_flux=$(qsub -W depend=afterok:$winter domain_flux_Hadriaca_Patera_cold_dr
 spring_flux=$(qsub -W depend=afterok:$spring domain_flux_Hadriaca_Patera_cold_dry_spring.pbs)
 summer_flux=$(qsub -W depend=afterok:$summer domain_flux_Hadriaca_Patera_cold_dry_summer.pbs)
 
-LMD=$(qsub -w depend=afterok:$fall_flux:$winter_flux:$spring_flux:$summer_flux pbs_LMD.pbs
+LMD=$(qsub -w depend=afterok:$fall_flux:$winter_flux:$spring_flux:$summer_flux pbs_LMD.pbs)
+
+filt=$(qsub -w depend=afterok:$LMD nc_volc_filt_.pbs)
