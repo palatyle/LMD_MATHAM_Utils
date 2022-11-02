@@ -13,14 +13,14 @@ os.chdir('D:\\')
 df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia.csv')
 
 # Read in GRS data
-df_GRS = pd.read_csv('C:\\Users\\palatyle\\Documents\\ArcGIS\\Projects\\Mars_GIS\\data\\GRS_data_raw.csv')
+df_GRS = pd.read_csv('C:\\Users\\palatyle\\Documents\\ArcGIS\\Projects\\Mars_GIS\\data\\GRS_data_raw_180.csv')
 
 # Sort data and drop Center Lon column
-df_GRS_sorted = df_GRS.sort_values(by=['Lon_fix','CenterLat'],ascending=False)
+df_GRS_sorted = df_GRS.sort_values(by=['lon_180','CenterLat'],ascending=False)
 df_GRS_sorted = df_GRS_sorted.drop(columns=['CenterLon'])
 
 # Convert to numpy array and only grab unique vals
-GRS_lons = df_GRS_sorted['Lon_fix'].to_numpy()
+GRS_lons = df_GRS_sorted['lon_180'].to_numpy()
 GRS_lons = np.unique(GRS_lons)
 
 GRS_lats = df_GRS_sorted['CenterLat'].to_numpy()
@@ -32,7 +32,7 @@ GRS_lats = GRS_lats[::-1]
 GRS_lon,GRS_lat = np.meshgrid(GRS_lons,GRS_lats)
 
 # Interpolate (really just reshape) GRS data to meshgrid
-GRS_vals_grd = griddata((df_GRS['Lon_fix'].to_numpy(),df_GRS['CenterLat'].to_numpy()),df_GRS['Concentration'].to_numpy(),(GRS_lon,GRS_lat),method='nearest')
+GRS_vals_grd = griddata((df_GRS['lon_180'].to_numpy(),df_GRS['CenterLat'].to_numpy()),df_GRS['Concentration'].to_numpy(),(GRS_lon,GRS_lat),method='nearest')
 plt.pcolormesh(GRS_lon,GRS_lat,GRS_vals_grd)
 plt.show
 
