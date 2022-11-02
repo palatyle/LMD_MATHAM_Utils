@@ -59,5 +59,14 @@ for volc_name in df_volc['Volcano Name']:
         volc_1= interpolate_data(lat,lon,GRS_lat,GRS_lon,temp[tracer][-1,:,:])
         np.save('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\' + volc_name + '_' + tracer, volc_1, allow_pickle=False)
         print("done with tracer: "+tracer+" and volcano: " + volc_name)
-
-    
+        if tracer == 'volc_1_surf':
+            volc1_xr = xr.DataArray(data = volc_1,coords={'Latitude': GRS_lats,'Longitude': GRS_lons},dims=['Latitude','Longitude'],name=tracer)
+        if tracer == 'volc_2_surf':
+            volc2_xr = xr.DataArray(data = volc_1,coords={'Latitude': GRS_lats,'Longitude': GRS_lons},dims=['Latitude','Longitude'],name=tracer)
+        if tracer == 'volc_3_surf':
+            volc3_xr = xr.DataArray(data = volc_1,coords={'Latitude': GRS_lats,'Longitude': GRS_lons},dims=['Latitude','Longitude'],name=tracer)    
+        if tracer == 'volc_4_surf':
+            volc4_xr = xr.DataArray(data = volc_1,coords={'Latitude': GRS_lats,'Longitude': GRS_lons},dims=['Latitude','Longitude'],name=tracer)
+            
+    volc_merged = xr.merge([volc1_xr,volc2_xr,volc3_xr,volc4_xr])
+    volc_merged.to_netcdf('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\' + volc_name +'_interp.nc')
