@@ -174,7 +174,7 @@ r_volc_4_df = pd.DataFrame(r_volc_4,columns=['r_val','r-p_val'])
 sp_volc_4_df = pd.DataFrame(sp_volc_4,columns=['sp_val','sp-p_val'])
 df_volc_4 = pd.merge(r_volc_4_df,sp_volc_4_df,left_index=True,right_index=True)
 
-p_set[df_volc_1.r_val.idxmax()]
+print(p_set[df_volc_1.r_val.idxmax()])
 
 print('Done in '+ str(t1-t0) + ' seconds')
 print('stop')
