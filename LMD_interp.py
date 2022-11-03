@@ -1,5 +1,6 @@
 import xarray as xr
 import pandas as pd
+import geopandas
 import matplotlib.pyplot as plt
 import os
 import numpy as np
@@ -70,5 +71,9 @@ for volc_name in df_volc['Volcano Name']:
             
     volc_merged = xr.merge([volc1_xr,volc2_xr,volc3_xr,volc4_xr])
     volc_merged_df = volc_merged.to_dataframe()
-    volc_merged_df.to_csv('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\' + volc_name +'_interp.csv')
+    volc_merged_df = volc_merged_df.reset_index()
+    gdf = geopandas.GeoDataFrame(volc_merged_df,geometry=geopandas.points_from_xy(volc_merged_df.longitude,volc_merged_df.latitude))
+    gdf = gdf.set_crs("ESRI:104971") # Mars 2000 Sphere coord system
+    gdf.to_file('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\' + volc_name +'_interp.gpkg',driver="GPKG")
+    # volc_merged_df.to_csv('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\' + volc_name +'_interp.csv')
     # volc_merged.to_netcdf('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\' + volc_name +'_interp.nc')
