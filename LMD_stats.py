@@ -15,8 +15,8 @@ def powerset(iterable):
     s = list(iterable)
     return chain.from_iterable(combinations(s,r) for r in range(len(s)+1))
 
-    
-os.chdir('data')
+os.getcwd()
+os.chdir('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data')
 
 # Read in volcano location data
 df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia.csv')
