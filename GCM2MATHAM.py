@@ -137,7 +137,7 @@ for atmos in ["cold_dry"]: #,"warm_wet"]:
     fn = dir+'diagfi.nc'
 
     # Volcano names filename
-    volc_fn = '/home/palatyle/GCM2MATHAM/Mars_Volc_locs.csv'
+    volc_fn = '/home/palatyle/GCM2MATHAM/Mars_Volc_locs_Arabia.csv'
 
     volc_df = pd.read_csv(volc_fn)
 

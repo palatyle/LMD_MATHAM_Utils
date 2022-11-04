@@ -4,7 +4,7 @@ import os
 import stat
 import shutil
 import glob
-master_GCM_dir = '/home/palatyle/LMD_gen/trunk/cold_dry_h2o/'
+master_GCM_dir = '/home/palatyle/LMD_gen/trunk/cold_dry/'
 cold_dry_dir = '/home/palatyle/LMD_gen/trunk/cold_dry/'
 warm_wet_dir = '/home/palatyle/LMD_gen/trunk/warm_wet/'
 MATHAM_dir = '/home/palatyle/P_MATHAM/'
@@ -13,6 +13,8 @@ domain_flux_dir = '/home/palatyle/LMD_MATHAM_Utils/MATHAM_run.py'
 GCM_datadir = '/home/palatyle/LMD_gen/trunk/datadir'
 # Volcano names filename
 volc_fn = '/home/palatyle/GCM2MATHAM/Mars_Volc_locs.csv'
+
+keyword = "3E7"
 
 volc_df = pd.read_csv(volc_fn)
 
@@ -23,9 +25,9 @@ for volc_name in volc_df['Volcano Name']:
     os.chdir(volc_name)
 
     for atmos in ["cold_dry"]:#,"warm_wet"]:
-        os.mkdir("/scratch/palatyle/" + volc_name + "_" + atmos)
-        os.mkdir(atmos)
-        os.chdir(atmos)
+        os.mkdir("/scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos)
+        os.mkdir(keyword+'_'+atmos)
+        os.chdir(keyword+'_'+atmos)
         current_dir = os.getcwd()
 
         # Copy over all .def files from master GCM directory
@@ -36,7 +38,7 @@ for volc_name in volc_df['Volcano Name']:
         file = open('callphys.def','r')
         callphys_def = file.readlines()
         # Edit output dir line
-        callphys_def[21] = "output_dir = /scratch/palatyle/" + volc_name + "_" + atmos + "/" + "diagfi.nc\n"
+        callphys_def[21] = "output_dir = /scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos + "/" + "diagfi.nc\n"
         callphys_def[24] = "callvolcano=.true."
         # Edit volcano name line
         callphys_def[46] = "volc_name=" + volc_name + "\n"
@@ -95,11 +97,11 @@ for volc_name in volc_df['Volcano Name']:
             MATHAM_exec = "/home/palatyle/P_MATHAM/exec/atham"
             
             i_flag = " -i /home/palatyle/P_MATHAM/IO_ref"
-            o_flag = " -o /scratch/palatyle/" + volc_name + "_" + atmos
+            o_flag = " -o /scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos
             f_flag = " -f MATHAM_" + season
             a_flag = " -a INPUT_atham_setup_Mars"
             p_flag = " -p " + volc_name + "_" + season + "_" + atmos
-            v_flag = " -v INPUT_volcano_mars"
+            v_flag = " -v INPUT_volcano_mars_3E7"
             d_flag = " -d INPUT_dynamic_setup"
 
             MATHAM_pbs[33] = "mpirun " + MATHAM_exec + i_flag + o_flag + f_flag + a_flag + p_flag + v_flag + d_flag + "\n"
@@ -113,7 +115,7 @@ for volc_name in volc_df['Volcano Name']:
             domain_flux_pbs = file.readlines()
 
             domain_flux_pbs[4] = "#PBS -N domain_flux_" + volc_name + "_" + atmos + "_" + season + "\n"
-            domain_flux_pbs[18] = "python " + outer_pbs_dir + "MATHAM_domain_flux.py -i /scratch/palatyle/" + volc_name + "_" + atmos + "/MATHAM_"+season+"_netCDF_MOV.nc -o " + GCM_datadir + '/' + volc_name + "_" + season + "_" + atmos +".txt\n"
+            domain_flux_pbs[18] = "python " + outer_pbs_dir + "MATHAM_domain_flux.py -i /scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos + "/MATHAM_"+season+"_netCDF_MOV.nc -o " + GCM_datadir + '/' + volc_name + "_" + season + "_" + atmos +".txt\n"
             
             file = open("domain_flux_"+ volc_name + "_" + atmos + "_" + season + ".pbs","w")
             file.writelines(domain_flux_pbs)
@@ -129,7 +131,7 @@ for volc_name in volc_df['Volcano Name']:
                 nc_volc_filt_pbs = file.readlines()
 
                 nc_volc_filt_pbs[4] = "#PBS -N nc_volc_filt_" + volc_name + "_" + atmos + "\n"
-                nc_volc_filt_pbs[18] = "python " + outer_pbs_dir +  "nc_volc_filt.py -i /scratch/palatyle/" + volc_name + "_" + atmos + "/" + "diagfi.nc -o /scratch/palatyle/" + volc_name + "_" + atmos + "/" + "diagfi_volc_filt.nc\n"
+                nc_volc_filt_pbs[18] = "python " + outer_pbs_dir +  "nc_volc_filt.py -i /scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos + "/" + "diagfi.nc -o /scratch/palatyle/" + volc_name + "_" + atmos + "/" + "diagfi_volc_filt.nc\n"
                 
                 file = open("nc_volc_filt_"+ volc_name + "_" + atmos + ".pbs","w")
                 file.writelines(nc_volc_filt_pbs)
