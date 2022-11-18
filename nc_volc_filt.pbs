@@ -6,7 +6,7 @@
 #PBS -m abe
 #PBS -M palatyle@isu.edu
 #PBS -l select=1:mem=150gb
-#PBS -l walltime=01:00:00
+#PBS -l walltime=02:00:00
 
 #PBS -P edu_res
 
