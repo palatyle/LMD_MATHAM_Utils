@@ -97,7 +97,7 @@ for tracer in tracer_names:
             temp_r, temp_sp = cf.get_r_val(volc_sum_4,GRS_vals_flattened)
             r_volc_4.append(temp_r)
             sp_volc_4.append(temp_sp)
-        print("tracer: " + tracer +" set: " + str(count) + '/' + str(len(p_set)))
+    print("tracer: " + tracer +" set: " + str(count) + '/' + str(len(p_set)))
 
 t1 = time.time()
 # # Interpolate volc sum array to GRS grid. Plot to check everything is working. 
@@ -134,8 +134,10 @@ sp_volc_4_df = pd.DataFrame(sp_volc_4,columns=['sp_val','sp-p_val'])
 df_volc_4 = pd.merge(r_volc_4_df,sp_volc_4_df,left_index=True,right_index=True)
 
 best_set = p_set[df_volc_1.r_val.idxmax()]
+best_set_df = pd.DataFrame(best_set)
+best_set_df.to_csv('best_volcs.csv')
 # df_volc_1.r_val.idxmax()
-print(best_set)
+print(best_set) 
 print('r: '+ str(df_volc_1['r_val'][df_volc_1.r_val.idxmax()]))
 print('r P val: ' + str(df_volc_1['r-p_val'][df_volc_1.r_val.idxmax()]))
 print('SP: ' + str(df_volc_1['sp_val'][df_volc_1.r_val.idxmax()]))
@@ -143,10 +145,10 @@ print('SP p val: ' + str(df_volc_1['sp-p_val'][df_volc_1.r_val.idxmax()]))
 
 best_volc_sum = np.zeros([36,72])
 for volc_name in best_set:
-    temp = cf.normalize(volc_1_dict[volc_name])
+    temp = volc_1_dict[volc_name]
     best_volc_sum += temp
 
-temp_xarr = cf.arr_to_xarr(best_volc_sum,GRS_lats,GRS_lons,"best_volcs")
+temp_xarr = cf.arr_to_xarr(cf.normalize(best_volc_sum),GRS_lats,GRS_lons,"volc_1_surf_norm")
 gdf = cf.xr_to_geodf(temp_xarr,"ESRI:104971")
 gdf.to_file('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\best_volcs.gpkg',driver="GPKG")
 print('Done in '+ str(t1-t0) + ' seconds')
