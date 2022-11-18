@@ -135,7 +135,10 @@ df_volc_4 = pd.merge(r_volc_4_df,sp_volc_4_df,left_index=True,right_index=True)
 
 best_set = p_set[df_volc_1.r_val.idxmax()]
 best_set_df = pd.DataFrame(best_set)
+best_set_df.columns = ['Volcano Name']
+pd.merge(best_set_df,df_volc[["Volcano Name","lat","lon"]],on="Volcano Name",how="left")
 best_set_df.to_csv('best_volcs.csv')
+
 # df_volc_1.r_val.idxmax()
 print(best_set) 
 print('r: '+ str(df_volc_1['r_val'][df_volc_1.r_val.idxmax()]))
@@ -143,6 +146,14 @@ print('r P val: ' + str(df_volc_1['r-p_val'][df_volc_1.r_val.idxmax()]))
 print('SP: ' + str(df_volc_1['sp_val'][df_volc_1.r_val.idxmax()]))
 print('SP p val: ' + str(df_volc_1['sp-p_val'][df_volc_1.r_val.idxmax()]))
 
+print("All Volcs:") 
+print('r: '+ str(df_volc_1['r_val'].iat[-1]))
+print('r P val: ' + str(df_volc_1['r-p_val'].iat[-1]))
+print('SP: ' + str(df_volc_1['sp_val'].iat[-1]))
+print('SP p val: ' + str(df_volc_1['sp-p_val'].iat[-1]))
+
+
+# For only best volcs
 best_volc_sum = np.zeros([36,72])
 for volc_name in best_set:
     temp = volc_1_dict[volc_name]
@@ -151,5 +162,18 @@ for volc_name in best_set:
 temp_xarr = cf.arr_to_xarr(cf.normalize(best_volc_sum),GRS_lats,GRS_lons,"volc_1_surf_norm")
 gdf = cf.xr_to_geodf(temp_xarr,"ESRI:104971")
 gdf.to_file('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\best_volcs.gpkg',driver="GPKG")
+
+
+# For all volcs
+all_volc_sum = np.zeros([36,72])
+for volc_name in p_set[-1]:
+    temp = volc_1_dict[volc_name]
+    all_volc_sum += temp
+
+temp_xarr = cf.arr_to_xarr(cf.normalize(all_volc_sum),GRS_lats,GRS_lons,"volc_1_surf_norm")
+gdf = cf.xr_to_geodf(temp_xarr,"ESRI:104971")
+gdf.to_file('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\all_volcs.gpkg',driver="GPKG")
+
+
 print('Done in '+ str(t1-t0) + ' seconds')
 print('stop')
