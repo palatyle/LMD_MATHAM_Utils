@@ -69,16 +69,16 @@ for tracer in tracer_names:
         # Loop through each volcano name in each set and normalize the data and sum if more than 1 volcano is present in set. 
         for name in set:
             if tracer == 'volc_1_surf':
-                temp = cf.normalize(volc_1_dict[name])
+                temp = volc_1_dict[name]
                 volc_sum_1 += temp
             elif tracer == 'volc_2_surf':
-                temp = cf.normalize(volc_2_dict[name])
+                temp = volc_2_dict[name]
                 volc_sum_2 += temp
             elif tracer == 'volc_3_surf':
-                temp = cf.normalize(volc_3_dict[name])
+                temp = volc_3_dict[name]
                 volc_sum_3 += temp
             elif tracer == 'volc_4_surf':
-                temp = cf.normalize(volc_4_dict[name])
+                temp = volc_4_dict[name]
                 volc_sum_4 += temp
         # With sum finished, calcualte r and shapiro wilkes test for every summed array
         if tracer == 'volc_1_surf':
