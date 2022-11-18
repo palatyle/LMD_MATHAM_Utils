@@ -116,6 +116,7 @@ t1 = time.time()
 # print(r)
 
 
+
 r_volc_1_df = pd.DataFrame(r_volc_1,columns=['r_val','r-p_val'])
 sp_volc_1_df = pd.DataFrame(sp_volc_1,columns=['sp_val','sp-p_val'])
 df_volc_1 = pd.merge(r_volc_1_df,sp_volc_1_df,left_index=True,right_index=True)
@@ -133,6 +134,12 @@ sp_volc_4_df = pd.DataFrame(sp_volc_4,columns=['sp_val','sp-p_val'])
 df_volc_4 = pd.merge(r_volc_4_df,sp_volc_4_df,left_index=True,right_index=True)
 
 best_set = p_set[df_volc_1.r_val.idxmax()]
+# df_volc_1.r_val.idxmax()
+print(best_set)
+print('r: '+ str(df_volc_1['r_val'][df_volc_1.r_val.idxmax()]))
+print('r P val: ' + str(df_volc_1['r-p_val'][df_volc_1.r_val.idxmax()]))
+print('SP: ' + str(df_volc_1['sp_val'][df_volc_1.r_val.idxmax()]))
+print('SP p val: ' + str(df_volc_1['sp-p_val'][df_volc_1.r_val.idxmax()]))
 
 best_volc_sum = np.zeros([36,72])
 for volc_name in best_set:
