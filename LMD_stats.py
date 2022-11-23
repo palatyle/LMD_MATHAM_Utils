@@ -3,6 +3,10 @@ import os
 import numpy as np
 import time
 import common_funcs as cf
+import seaborn as sns
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+from scipy.stats import shapiro, boxcox
 
 # Start timer
 t0 = time.time()
@@ -21,7 +25,29 @@ p_set.pop(0) #Removes first element which is empty
 df_GRS = pd.read_csv('GRS_data_raw_180.csv')
 
 # Wrangle GRS data into list of lats + lons + full array flattened (for use in correlation calc)
-GRS_lats,GRS_lons,GRS_vals_flattened = cf.GRS_wrangle(df_GRS)
+GRS_lats,GRS_lons,GRS_vals_flattened,GRS_grid = cf.GRS_wrangle(df_GRS)
+
+# GRS_vals_flattened = GRS_vals_flattened[~np.isnan(GRS_vals_flattened)]
+
+# fig,ax = plt.subplots(3,2)
+# fig.tight_layout()
+
+# fig2,ax2 = plt.subplots(3,2)
+# fig2.tight_layout()
+
+
+# lambdas = [-1,-0.5,0.0,0.5,1.0]
+# for idx, la in enumerate(lambdas):
+#     sm.qqplot((boxcox(GRS_vals_flattened,la)),ax=ax.ravel()[idx])
+#     ax.ravel()[idx].set_title('lambda='+str(la))
+#     print(shapiro(boxcox(GRS_vals_flattened,la)))
+    
+#     sns.histplot((boxcox(GRS_vals_flattened,la)),ax=ax2.ravel()[idx])
+#     ax2.ravel()[idx].set_title('lambda='+str(la))
+# plt.show()
+
+# Log transformation to become normal(ish)
+GRS_vals_flattened_trans = boxcox(GRS_vals_flattened,0)
 
 # Define tracer names to loop through
 tracer_names = ['volc_1_surf','volc_2_surf','volc_3_surf','volc_4_surf',]
@@ -57,6 +83,11 @@ sp_volc_2 = []
 sp_volc_3 = []
 sp_volc_4 = []
 
+lambda_1 = []
+lambda_2 = []
+lambda_3 = []
+lambda_4 = []
+
 # Loop through the 4 volcanic tracers
 for tracer in tracer_names:
     # Loop through the superset
@@ -82,21 +113,25 @@ for tracer in tracer_names:
                 volc_sum_4 += temp
         # With sum finished, calcualte r and shapiro wilkes test for every summed array
         if tracer == 'volc_1_surf':
-            temp_r, temp_sp = cf.get_r_val(volc_sum_1,GRS_vals_flattened)
+            temp_r, temp_sp, temp_lambda = cf.get_r_val(volc_sum_1,GRS_vals_flattened)
             r_volc_1.append(temp_r)
             sp_volc_1.append(temp_sp)
+            lambda_1.append(temp_lambda)
         elif tracer == 'volc_2_surf':
-            temp_r, temp_sp = cf.get_r_val(volc_sum_2,GRS_vals_flattened)
+            temp_r, temp_sp, temp_lambda = cf.get_r_val(volc_sum_2,GRS_vals_flattened)
             r_volc_2.append(temp_r)
             sp_volc_2.append(temp_sp)
+            lambda_2.append(temp_lambda)
         elif tracer == 'volc_3_surf':
-            temp_r, temp_sp = cf.get_r_val(volc_sum_3,GRS_vals_flattened)
+            temp_r, temp_sp, temp_lambda  = cf.get_r_val(volc_sum_3,GRS_vals_flattened)
             r_volc_3.append(temp_r)
             sp_volc_3.append(temp_sp)
+            lambda_3.append(temp_lambda)
         elif tracer == 'volc_4_surf':
-            temp_r, temp_sp = cf.get_r_val(volc_sum_4,GRS_vals_flattened)
+            temp_r, temp_sp, temp_lambda  = cf.get_r_val(volc_sum_4,GRS_vals_flattened)
             r_volc_4.append(temp_r)
             sp_volc_4.append(temp_sp)
+            lambda_4.append(temp_lambda)
     print("tracer: " + tracer +" set: " + str(count) + '/' + str(len(p_set)))
 
 t1 = time.time()
@@ -119,19 +154,23 @@ t1 = time.time()
 
 r_volc_1_df = pd.DataFrame(r_volc_1,columns=['r_val','r-p_val'])
 sp_volc_1_df = pd.DataFrame(sp_volc_1,columns=['sp_val','sp-p_val'])
-df_volc_1 = pd.merge(r_volc_1_df,sp_volc_1_df,left_index=True,right_index=True)
+lambda_1_df = pd.DataFrame(lambda_1,columns=['lambda'])
+df_volc_1 = pd.merge(r_volc_1_df,sp_volc_1_df,lambda_1_df,left_index=True,right_index=True)
 
 r_volc_2_df = pd.DataFrame(r_volc_2,columns=['r_val','r-p_val'])
 sp_volc_2_df = pd.DataFrame(sp_volc_2,columns=['sp_val','sp-p_val'])
-df_volc_2 = pd.merge(r_volc_2_df,sp_volc_2_df,left_index=True,right_index=True)
+lambda_2_df = pd.DataFrame(lambda_2,columns=['lambda'])
+df_volc_2 = pd.merge(r_volc_2_df,sp_volc_2_df,lambda_2_df,left_index=True,right_index=True)
 
 r_volc_3_df = pd.DataFrame(r_volc_3,columns=['r_val','r-p_val'])
 sp_volc_3_df = pd.DataFrame(sp_volc_3,columns=['sp_val','sp-p_val'])
-df_volc_3 = pd.merge(r_volc_3_df,sp_volc_3_df,left_index=True,right_index=True)
+lambda_3_df = pd.DataFrame(lambda_3,columns=['lambda'])
+df_volc_3 = pd.merge(r_volc_3_df,sp_volc_3_df,lambda_3_df,left_index=True,right_index=True)
 
 r_volc_4_df = pd.DataFrame(r_volc_4,columns=['r_val','r-p_val'])
 sp_volc_4_df = pd.DataFrame(sp_volc_4,columns=['sp_val','sp-p_val'])
-df_volc_4 = pd.merge(r_volc_4_df,sp_volc_4_df,left_index=True,right_index=True)
+lambda_4_df = pd.DataFrame(lambda_4,columns=['lambda'])
+df_volc_4 = pd.merge(r_volc_4_df,sp_volc_4_df,lambda_4_df,left_index=True,right_index=True)
 
 best_set = p_set[df_volc_1.r_val.idxmax()]
 best_set_df = pd.DataFrame(best_set)
@@ -145,12 +184,17 @@ print('r: '+ str(df_volc_1['r_val'][df_volc_1.r_val.idxmax()]))
 print('r P val: ' + str(df_volc_1['r-p_val'][df_volc_1.r_val.idxmax()]))
 print('SP: ' + str(df_volc_1['sp_val'][df_volc_1.r_val.idxmax()]))
 print('SP p val: ' + str(df_volc_1['sp-p_val'][df_volc_1.r_val.idxmax()]))
+print('Lambda: '+ str(df_volc_1['lambda'][df_volc_1.r_val.idxmax]))
 
 print("All Volcs:") 
 print('r: '+ str(df_volc_1['r_val'].iat[-1]))
 print('r P val: ' + str(df_volc_1['r-p_val'].iat[-1]))
 print('SP: ' + str(df_volc_1['sp_val'].iat[-1]))
 print('SP p val: ' + str(df_volc_1['sp-p_val'].iat[-1]))
+print('Lambda: '+ str(df_volc_1['lambda'].iat[-1]))
+
+
+
 
 
 # For only best volcs
@@ -169,6 +213,9 @@ all_volc_sum = np.zeros([36,72])
 for volc_name in p_set[-1]:
     temp = volc_1_dict[volc_name]
     all_volc_sum += temp
+
+sm.qqplot(GRS_vals_flattened)
+
 
 temp_xarr = cf.arr_to_xarr(all_volc_sum,GRS_lats,GRS_lons,"volc_1_surf_norm")
 gdf = cf.xr_to_geodf(temp_xarr,"ESRI:104971")
