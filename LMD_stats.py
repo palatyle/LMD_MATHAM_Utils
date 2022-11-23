@@ -69,16 +69,16 @@ for tracer in tracer_names:
         # Loop through each volcano name in each set and normalize the data and sum if more than 1 volcano is present in set. 
         for name in set:
             if tracer == 'volc_1_surf':
-                temp = cf.normalize(volc_1_dict[name])
+                temp = volc_1_dict[name]
                 volc_sum_1 += temp
             elif tracer == 'volc_2_surf':
-                temp = cf.normalize(volc_2_dict[name])
+                temp = volc_2_dict[name]
                 volc_sum_2 += temp
             elif tracer == 'volc_3_surf':
-                temp = cf.normalize(volc_3_dict[name])
+                temp = volc_3_dict[name]
                 volc_sum_3 += temp
             elif tracer == 'volc_4_surf':
-                temp = cf.normalize(volc_4_dict[name])
+                temp = volc_4_dict[name]
                 volc_sum_4 += temp
         # With sum finished, calcualte r and shapiro wilkes test for every summed array
         if tracer == 'volc_1_surf':
@@ -97,7 +97,7 @@ for tracer in tracer_names:
             temp_r, temp_sp = cf.get_r_val(volc_sum_4,GRS_vals_flattened)
             r_volc_4.append(temp_r)
             sp_volc_4.append(temp_sp)
-        print("tracer: " + tracer +" set: " + str(count) + '/' + str(len(p_set)))
+    print("tracer: " + tracer +" set: " + str(count) + '/' + str(len(p_set)))
 
 t1 = time.time()
 # # Interpolate volc sum array to GRS grid. Plot to check everything is working. 
@@ -114,6 +114,7 @@ t1 = time.time()
 
 # r = scipy.stats.pearsonr(GRS_flat_nn, volc_interp_flat_nn)
 # print(r)
+
 
 
 r_volc_1_df = pd.DataFrame(r_volc_1,columns=['r_val','r-p_val'])
@@ -133,14 +134,46 @@ sp_volc_4_df = pd.DataFrame(sp_volc_4,columns=['sp_val','sp-p_val'])
 df_volc_4 = pd.merge(r_volc_4_df,sp_volc_4_df,left_index=True,right_index=True)
 
 best_set = p_set[df_volc_1.r_val.idxmax()]
+best_set_df = pd.DataFrame(best_set)
+best_set_df.columns = ['Volcano Name']
+pd.merge(best_set_df,df_volc[["Volcano Name","lat","lon"]],on="Volcano Name",how="left")
+best_set_df.to_csv('best_volcs.csv')
 
+# df_volc_1.r_val.idxmax()
+print(best_set) 
+print('r: '+ str(df_volc_1['r_val'][df_volc_1.r_val.idxmax()]))
+print('r P val: ' + str(df_volc_1['r-p_val'][df_volc_1.r_val.idxmax()]))
+print('SP: ' + str(df_volc_1['sp_val'][df_volc_1.r_val.idxmax()]))
+print('SP p val: ' + str(df_volc_1['sp-p_val'][df_volc_1.r_val.idxmax()]))
+
+print("All Volcs:") 
+print('r: '+ str(df_volc_1['r_val'].iat[-1]))
+print('r P val: ' + str(df_volc_1['r-p_val'].iat[-1]))
+print('SP: ' + str(df_volc_1['sp_val'].iat[-1]))
+print('SP p val: ' + str(df_volc_1['sp-p_val'].iat[-1]))
+
+
+# For only best volcs
 best_volc_sum = np.zeros([36,72])
 for volc_name in best_set:
-    temp = cf.normalize(volc_1_dict[volc_name])
+    temp = volc_1_dict[volc_name]
     best_volc_sum += temp
 
-temp_xarr = cf.arr_to_xarr(best_volc_sum,GRS_lats,GRS_lons,"best_volcs")
+temp_xarr = cf.arr_to_xarr(cf.normalize(best_volc_sum),GRS_lats,GRS_lons,"volc_1_surf_norm")
 gdf = cf.xr_to_geodf(temp_xarr,"ESRI:104971")
 gdf.to_file('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\best_volcs.gpkg',driver="GPKG")
+
+
+# For all volcs
+all_volc_sum = np.zeros([36,72])
+for volc_name in p_set[-1]:
+    temp = volc_1_dict[volc_name]
+    all_volc_sum += temp
+
+temp_xarr = cf.arr_to_xarr(cf.normalize(all_volc_sum),GRS_lats,GRS_lons,"volc_1_surf_norm")
+gdf = cf.xr_to_geodf(temp_xarr,"ESRI:104971")
+gdf.to_file('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\all_volcs.gpkg',driver="GPKG")
+
+
 print('Done in '+ str(t1-t0) + ' seconds')
 print('stop')
