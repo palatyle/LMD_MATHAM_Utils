@@ -159,7 +159,7 @@ for volc_name in best_set:
     temp = volc_1_dict[volc_name]
     best_volc_sum += temp
 
-temp_xarr = cf.arr_to_xarr(cf.normalize(best_volc_sum),GRS_lats,GRS_lons,"volc_1_surf_norm")
+temp_xarr = cf.arr_to_xarr(best_volc_sum,GRS_lats,GRS_lons,"volc_1_surf_norm")
 gdf = cf.xr_to_geodf(temp_xarr,"ESRI:104971")
 gdf.to_file('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\best_volcs.gpkg',driver="GPKG")
 
@@ -170,7 +170,7 @@ for volc_name in p_set[-1]:
     temp = volc_1_dict[volc_name]
     all_volc_sum += temp
 
-temp_xarr = cf.arr_to_xarr(cf.normalize(all_volc_sum),GRS_lats,GRS_lons,"volc_1_surf_norm")
+temp_xarr = cf.arr_to_xarr(all_volc_sum,GRS_lats,GRS_lons,"volc_1_surf_norm")
 gdf = cf.xr_to_geodf(temp_xarr,"ESRI:104971")
 gdf.to_file('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\all_volcs.gpkg',driver="GPKG")
 
