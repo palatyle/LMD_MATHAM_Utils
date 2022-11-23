@@ -136,7 +136,7 @@ df_volc_4 = pd.merge(r_volc_4_df,sp_volc_4_df,left_index=True,right_index=True)
 best_set = p_set[df_volc_1.r_val.idxmax()]
 best_set_df = pd.DataFrame(best_set)
 best_set_df.columns = ['Volcano Name']
-pd.merge(best_set_df,df_volc[["Volcano Name","lat","lon"]],on="Volcano Name",how="left")
+best_set_df = pd.merge(best_set_df,df_volc[["Volcano Name","lat","lon"]],on="Volcano Name",how="left")
 best_set_df.to_csv('best_volcs.csv')
 
 # df_volc_1.r_val.idxmax()
