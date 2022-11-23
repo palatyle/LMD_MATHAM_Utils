@@ -4,8 +4,8 @@ import os
 import stat
 import shutil
 import glob
-master_GCM_dir = '/home/palatyle/LMD_gen/trunk/cold_dry/'
-cold_dry_dir = '/home/palatyle/LMD_gen/trunk/cold_dry/'
+master_GCM_dir = '/home/palatyle/LMD_gen/trunk/cold_dry_no_tharsis/'
+cold_dry_dir = '/home/palatyle/LMD_gen/trunk/cold_dry_no_tharsis/'
 warm_wet_dir = '/home/palatyle/LMD_gen/trunk/warm_wet/'
 MATHAM_dir = '/home/palatyle/P_MATHAM/'
 outer_pbs_dir = '/home/palatyle/LMD_MATHAM_Utils/'
@@ -14,7 +14,7 @@ GCM_datadir = '/home/palatyle/LMD_gen/trunk/datadir'
 # Volcano names filename
 volc_fn = '/home/palatyle/GCM2MATHAM/Mars_Volc_locs.csv'
 
-keyword = "Base"
+keyword = "no_tharsis"
 os.mkdir(keyword)
 shutil.copy2('batch_start.sh',keyword)
 os.chdir(keyword)
@@ -48,6 +48,9 @@ for volc_name in volc_df['Volcano Name']:
 
         # Edit atmosphere type line
         callphys_def[51] = "atmos_type=" + atmos + "\n"
+    
+        # Edit input_key line
+        callphys_def[57] = "input_key = " + keyword + "\n"
     
         # Write edited lines to file
         file = open('callphys.def','w')
@@ -118,7 +121,7 @@ for volc_name in volc_df['Volcano Name']:
             domain_flux_pbs = file.readlines()
 
             domain_flux_pbs[4] = "#PBS -N domain_flux_" + volc_name + "_" + atmos + "_" + season + "\n"
-            domain_flux_pbs[18] = "python " + outer_pbs_dir + "MATHAM_domain_flux.py -i /scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos + "/MATHAM_"+season+"_netCDF_MOV.nc -o " + GCM_datadir + '/' + volc_name + "_" + season + "_" + atmos +".txt\n"
+            domain_flux_pbs[18] = "python " + outer_pbs_dir + "MATHAM_domain_flux.py -i /scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos + "/MATHAM_"+season+"_netCDF_MOV.nc -o " + GCM_datadir + '/' + volc_name + "_" + season + "_" + atmos + "_" + keyword + ".txt\n"
             
             file = open("domain_flux_"+ volc_name + "_" + atmos + "_" + season + ".pbs","w")
             file.writelines(domain_flux_pbs)
