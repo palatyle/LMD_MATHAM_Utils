@@ -31,15 +31,11 @@ def xr_to_geodf(xr_dat,crs):
 def arr_to_xarr(arr, lats_arr, lons_arr, name):
     return xr.DataArray(data = arr,coords={'latitude': lats_arr,'longitude': lons_arr},dims=['latitude','longitude'],name=name)
 
+
 def transformation_test(arr):
-    lambdas = np.linspace(-1,1,5)
-    p_vals = []
-    sp_vals = []
-    for la in lambdas:
-        sp,p = shapiro(boxcox(arr,la))
-        p_vals.append(p)
-        sp_vals.append(sp)
-    return sp_vals[np.argmax(p_vals)], np.max(p_vals), lambdas[np.argmax(p_vals)]
+    arr_trans, lamb = boxcox(arr)
+    
+    return arr_trans,lamb
 
 
 
@@ -50,13 +46,14 @@ def get_r_val(volc_dep,GRS_dat):
     volc_dep_flat_nn = volc_dep_flat[~np.isnan(GRS_dat)]
     GRS_dat_flat_nn = GRS_dat[~np.isnan(GRS_dat)]
     
-    sp_val, sp_p_val, max_lambda = transformation_test(volc_dep_flat_nn)
+    volc_dep_flat_trans, best_lambda = transformation_test(volc_dep_flat_nn)
     
-    sp = (sp_val,sp_p_val)
     
-    r = pearsonr(GRS_dat_flat_nn,boxcox(volc_dep_flat_nn,max_lambda))
+    sp = shapiro(volc_dep_flat_trans)
+    
+    r = pearsonr(GRS_dat_flat_nn,volc_dep_flat_trans)
  
-    return r, sp, max_lambda
+    return r, sp, best_lambda
 
 def GRS_wrangle(df):
     # Sort data and drop Center Lon column

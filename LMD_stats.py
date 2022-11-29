@@ -12,7 +12,7 @@ from scipy.stats import shapiro, boxcox, probplot, pearsonr, spearmanr, normalte
 t0 = time.time()
 
 # Change directory to data directory
-os.chdir('LMD_MATHAM_Utils/data')
+os.chdir('data')
 
 # Read in volcano location data
 df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia.csv')
@@ -48,7 +48,8 @@ GRS_lats,GRS_lons,GRS_vals_flattened,GRS_grid = cf.GRS_wrangle(df_GRS)
 
 
 # Define tracer names to loop through
-tracer_names = ['volc_1_surf','volc_2_surf','volc_3_surf','volc_4_surf',]
+# tracer_names = ['volc_1_surf','volc_2_surf','volc_3_surf','volc_4_surf',]
+tracer_names = ['volc_1_surf']
 
 # Define empty dictionaries for each tracer
 volc_1_dict = {}
@@ -103,10 +104,6 @@ print(normaltest(GRS_vals_flattened_nn))
 print('Pearson r:') 
 print(pearsonr(all_volc_flat_nn,GRS_vals_flattened_nn))
 
-print('Spearman r:') 
-print(spearmanr(all_volc_flat_nn,GRS_vals_flattened_nn))
-
-
 GRS_box = boxcox(GRS_vals_flattened_nn)
 all_volc_box = boxcox(all_volc_flat_nn)
 sns.jointplot(x=all_volc_box[0],y=GRS_box[0])
@@ -129,81 +126,8 @@ print(normaltest(GRS_box[0]))
 print('Pearson r:') 
 print(pearsonr(all_volc_box[0],GRS_box[0]))
 
-print('Spearman r:') 
-print(spearmanr(all_volc_box[0],GRS_box[0]))
 
 
-
-
-Apollinaris = volc_1_dict['Apollinaris_Patera'].flatten()
-Apollinaris_nn = Apollinaris[~np.isnan(GRS_vals_flattened)]
-Apollinaris_box = boxcox(Apollinaris_nn)
-sns.jointplot(x=Apollinaris_nn,y=GRS_vals_flattened_nn)
-plt.suptitle('Apollinaris vs. GRS')
-
-print("\nApollinaris vs. GRS")
-
-print('Shapiro volc:') 
-print(shapiro(Apollinaris_nn))
-
-print('Shapiro GRS:') 
-print(shapiro(GRS_vals_flattened_nn))
-
-print('Normaltest volc:') 
-print(normaltest(Apollinaris_nn))
-
-print('Normaltest GRS:') 
-print(normaltest(GRS_vals_flattened_nn))
-
-print('Pearson r:') 
-print(pearsonr(Apollinaris_nn,GRS_vals_flattened_nn))
-
-print('Spearman r:') 
-print(spearmanr(Apollinaris_nn,GRS_vals_flattened_nn))
-
-sns.jointplot(x=Apollinaris_box[0],y=GRS_box[0])
-plt.suptitle('Apollinaris vs. GRS : Transformed')
-
-print("\nApollinaris vs. GRS : Transformed")
-
-print('Shapiro volc:') 
-print(shapiro(Apollinaris_box[0]))
-
-print('Shapiro GRS:') 
-print(shapiro(GRS_box[0]))
-
-print('Normaltest volc:') 
-print(normaltest(Apollinaris_box[0]))
-
-print('Normaltest GRS:') 
-print(normaltest(GRS_box[0]))
-
-print('Pearson r:') 
-print(pearsonr(Apollinaris_box[0],GRS_box[0]))
-
-print('Spearman r:') 
-print(spearmanr(Apollinaris_box[0],GRS_box[0]))
-
-
-
-fig,ax = plt.subplots()
-probplot(all_volc_flat_nn,plot=ax)
-# probplot(all_volc_box[0],plot=ax)
-
-fig2,ax2 = plt.subplots()
-probplot(GRS_vals_flattened_nn,plot=ax2)
-
-# fig,ax = plt.subplots()
-# ax.scatter(all_volc_flat_nn,GRS_vals_flattened_nn)
-
-# fig2,ax2 = plt.subplots()
-# ax2.hist(all_volc_flat_nn)
-
-# fig3,ax3 = plt.subplots()
-# ax3.hist(GRS_vals_flattened_nn)
-
-
-# ax3.hist(GRS_vals_flattened_trans)
 
 # For only best volcs
 best_set = ['Apollinaris_Patera','Cerberus','Olympus_Mons','Pavonis_Mons','Ascraeus_Mons','Syrtis_Major','Tyrrhenia_Patera','Alba_Patera','Siloe_Patera']
@@ -282,86 +206,87 @@ for tracer in tracer_names:
     print("tracer: " + tracer +" set: " + str(count) + '/' + str(len(p_set)))
 
 t1 = time.time()
-# # Interpolate volc sum array to GRS grid. Plot to check everything is working. 
-# interp = RegularGridInterpolator((lat,lon),ds_volc.volc_1_surf,method="nearest")
-# volc_interp = interp((GRS_lat,GRS_lon))
-# plt.pcolormesh(GRS_lon,GRS_lat,volc_interp)
-# # plt.show()
-
-# GRS_flat = GRS_vals_grd.reshape(GRS_vals_grd.shape[0]*GRS_vals_grd.shape[1])
-# volc_interp_flat = volc_interp.reshape(volc_interp.shape[0]*volc_interp.shape[1])
-
-# volc_interp_flat_nn = volc_interp_flat[~np.isnan(GRS_flat)]
-# GRS_flat_nn = GRS_flat[~np.isnan(GRS_flat)]
-
-# r = scipy.stats.pearsonr(GRS_flat_nn, volc_interp_flat_nn)
-# print(r)
-
-
 
 r_volc_1_df = pd.DataFrame(r_volc_1,columns=['r_val','r-p_val'])
 sp_volc_1_df = pd.DataFrame(sp_volc_1,columns=['sp_val','sp-p_val'])
 lambda_1_df = pd.DataFrame(lambda_1,columns=['lambda'])
-df_volc_1 = pd.merge(r_volc_1_df,sp_volc_1_df,lambda_1_df,left_index=True,right_index=True)
+df_volc_1 = pd.concat([r_volc_1_df,sp_volc_1_df,lambda_1_df],axis=1)
 
-r_volc_2_df = pd.DataFrame(r_volc_2,columns=['r_val','r-p_val'])
-sp_volc_2_df = pd.DataFrame(sp_volc_2,columns=['sp_val','sp-p_val'])
-lambda_2_df = pd.DataFrame(lambda_2,columns=['lambda'])
-df_volc_2 = pd.merge(r_volc_2_df,sp_volc_2_df,lambda_2_df,left_index=True,right_index=True)
 
-r_volc_3_df = pd.DataFrame(r_volc_3,columns=['r_val','r-p_val'])
-sp_volc_3_df = pd.DataFrame(sp_volc_3,columns=['sp_val','sp-p_val'])
-lambda_3_df = pd.DataFrame(lambda_3,columns=['lambda'])
-df_volc_3 = pd.merge(r_volc_3_df,sp_volc_3_df,lambda_3_df,left_index=True,right_index=True)
+# r_volc_2_df = pd.DataFrame(r_volc_2,columns=['r_val','r-p_val'])
+# sp_volc_2_df = pd.DataFrame(sp_volc_2,columns=['sp_val','sp-p_val'])
+# lambda_2_df = pd.DataFrame(lambda_2,columns=['lambda'])
+# df_volc_2 = pd.merge(r_volc_2_df,sp_volc_2_df,lambda_2_df,left_index=True,right_index=True)
 
-r_volc_4_df = pd.DataFrame(r_volc_4,columns=['r_val','r-p_val'])
-sp_volc_4_df = pd.DataFrame(sp_volc_4,columns=['sp_val','sp-p_val'])
-lambda_4_df = pd.DataFrame(lambda_4,columns=['lambda'])
-df_volc_4 = pd.merge(r_volc_4_df,sp_volc_4_df,lambda_4_df,left_index=True,right_index=True)
+# r_volc_3_df = pd.DataFrame(r_volc_3,columns=['r_val','r-p_val'])
+# sp_volc_3_df = pd.DataFrame(sp_volc_3,columns=['sp_val','sp-p_val'])
+# lambda_3_df = pd.DataFrame(lambda_3,columns=['lambda'])
+# df_volc_3 = pd.merge(r_volc_3_df,sp_volc_3_df,lambda_3_df,left_index=True,right_index=True)
 
-best_set = p_set[df_volc_1.r_val.idxmax()]
-best_set_df = pd.DataFrame(best_set)
-best_set_df.columns = ['Volcano Name']
-best_set_df = pd.merge(best_set_df,df_volc[["Volcano Name","lat","lon"]],on="Volcano Name",how="left")
-best_set_df.to_csv('best_volcs.csv')
+# r_volc_4_df = pd.DataFrame(r_volc_4,columns=['r_val','r-p_val'])
+# sp_volc_4_df = pd.DataFrame(sp_volc_4,columns=['sp_val','sp-p_val'])
+# lambda_4_df = pd.DataFrame(lambda_4,columns=['lambda'])
+# df_volc_4 = pd.merge(r_volc_4_df,sp_volc_4_df,lambda_4_df,left_index=True,right_index=True)
 
-# df_volc_1.r_val.idxmax()
-print(best_set) 
-print('r: '+ str(df_volc_1['r_val'][df_volc_1.r_val.idxmax()]))
-print('r P val: ' + str(df_volc_1['r-p_val'][df_volc_1.r_val.idxmax()]))
-print('SP: ' + str(df_volc_1['sp_val'][df_volc_1.r_val.idxmax()]))
-print('SP p val: ' + str(df_volc_1['sp-p_val'][df_volc_1.r_val.idxmax()]))
-print('Lambda: '+ str(df_volc_1['lambda'][df_volc_1.r_val.idxmax]))
 
-print("All Volcs:") 
-print('r: '+ str(df_volc_1['r_val'].iat[-1]))
-print('r P val: ' + str(df_volc_1['r-p_val'].iat[-1]))
-print('SP: ' + str(df_volc_1['sp_val'].iat[-1]))
-print('SP p val: ' + str(df_volc_1['sp-p_val'].iat[-1]))
-print('Lambda: '+ str(df_volc_1['lambda'].iat[-1]))
+# best_set = p_set[df_volc_1.r_val.idxmax()]
+# best_set_df = pd.DataFrame(best_set)
+# best_set_df.columns = ['Volcano Name']
+# best_set_df = pd.merge(best_set_df,df_volc[["Volcano Name","lat","lon"]],on="Volcano Name",how="left")
+# best_set_df.to_csv('best_volcs.csv')
+
+
+best_sets = [p_set[i] for i in list(df_volc_1.r_val.nlargest(15).index)]
+print(*best_sets,sep='\n')
+print(df_volc_1.iloc[list(df_volc_1.r_val.nlargest(15).index)])
+
+
+best_sets_normal = [p_set[i] for i in list(df_volc_1[df_volc_1['sp-p_val']>0.05].r_val.nlargest(15).index)]
+
+print(*best_sets_normal,sep='\n')
+print(df_volc_1.iloc[list(df_volc_1[df_volc_1['sp-p_val']>0.05].r_val.nlargest(15).index)])
 
 
 
 
 
-# For only best volcs
-best_volc_sum = np.zeros([36,72])
-for volc_name in best_set:
-    temp = volc_1_dict[volc_name]
-    best_volc_sum += temp
+# # df_volc_1.r_val.idxmax()
+# print(best_set) 
+# print('r: '+ str(df_volc_1['r_val'][df_volc_1.r_val.idxmax()]))
+# print('r P val: ' + str(df_volc_1['r-p_val'][df_volc_1.r_val.idxmax()]))
+# print('SP: ' + str(df_volc_1['sp_val'][df_volc_1.r_val.idxmax()]))
+# print('SP p val: ' + str(df_volc_1['sp-p_val'][df_volc_1.r_val.idxmax()]))
+# print('Lambda: '+ str(df_volc_1['lambda'][df_volc_1.r_val.idxmax]))
 
-temp_xarr = cf.arr_to_xarr(best_volc_sum,GRS_lats,GRS_lons,"volc_1_surf_norm")
-gdf = cf.xr_to_geodf(temp_xarr,"ESRI:104971")
-gdf.to_file('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\best_volcs.gpkg',driver="GPKG")
-
-
-sm.qqplot(GRS_vals_flattened)
-
-
-temp_xarr = cf.arr_to_xarr(all_volc_sum,GRS_lats,GRS_lons,"volc_1_surf_norm")
-gdf = cf.xr_to_geodf(temp_xarr,"ESRI:104971")
-gdf.to_file('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\all_volcs.gpkg',driver="GPKG")
+# print("All Volcs:") 
+# print('r: '+ str(df_volc_1['r_val'].iat[-1]))
+# print('r P val: ' + str(df_volc_1['r-p_val'].iat[-1]))
+# print('SP: ' + str(df_volc_1['sp_val'].iat[-1]))
+# print('SP p val: ' + str(df_volc_1['sp-p_val'].iat[-1]))
+# print('Lambda: '+ str(df_volc_1['lambda'].iat[-1]))
 
 
-print('Done in '+ str(t1-t0) + ' seconds')
-print('stop')
+
+
+
+# # For only best volcs
+# best_volc_sum = np.zeros([36,72])
+# for volc_name in best_set:
+#     temp = volc_1_dict[volc_name]
+#     best_volc_sum += temp
+
+# temp_xarr = cf.arr_to_xarr(best_volc_sum,GRS_lats,GRS_lons,"volc_1_surf_norm")
+# gdf = cf.xr_to_geodf(temp_xarr,"ESRI:104971")
+# gdf.to_file('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\best_volcs.gpkg',driver="GPKG")
+
+
+# sm.qqplot(GRS_vals_flattened)
+
+
+# temp_xarr = cf.arr_to_xarr(all_volc_sum,GRS_lats,GRS_lons,"volc_1_surf_norm")
+# gdf = cf.xr_to_geodf(temp_xarr,"ESRI:104971")
+# gdf.to_file('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\all_volcs.gpkg',driver="GPKG")
+
+
+# print('Done in '+ str(t1-t0) + ' seconds')
+# print('stop')
