@@ -6,13 +6,13 @@ import common_funcs as cf
 import seaborn as sns
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
-from scipy.stats import shapiro, boxcox
+from scipy.stats import shapiro, boxcox, probplot, pearsonr, spearmanr, normaltest
 
 # Start timer
 t0 = time.time()
 
 # Change directory to data directory
-os.chdir('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data')
+os.chdir('LMD_MATHAM_Utils/data')
 
 # Read in volcano location data
 df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia.csv')
@@ -46,8 +46,6 @@ GRS_lats,GRS_lons,GRS_vals_flattened,GRS_grid = cf.GRS_wrangle(df_GRS)
 #     ax2.ravel()[idx].set_title('lambda='+str(la))
 # plt.show()
 
-# Log transformation to become normal(ish)
-GRS_vals_flattened_trans = boxcox(GRS_vals_flattened,0)
 
 # Define tracer names to loop through
 tracer_names = ['volc_1_surf','volc_2_surf','volc_3_surf','volc_4_surf',]
@@ -71,6 +69,155 @@ for volc_name in df_volc['Volcano Name']:
             volc_4_dict[volc_name] = np.load(volc_name + '_' + tracer + '.npy')
         print("done with tracer: "+tracer+" and volcano: " + volc_name)
 
+
+# For all volcs
+all_volc_sum = np.zeros([36,72])
+for volc_name in p_set[-1]:
+    temp = volc_1_dict[volc_name]
+    all_volc_sum += temp
+
+all_volc_flat = all_volc_sum.flatten()
+all_volc_flat_nn = all_volc_flat[~np.isnan(GRS_vals_flattened)]
+GRS_vals_flattened_nn = GRS_vals_flattened[~np.isnan(GRS_vals_flattened)]
+
+# Log transformation to become normal(ish)
+GRS_vals_flattened_trans = boxcox(GRS_vals_flattened_nn,0)
+
+
+sns.jointplot(x=all_volc_flat_nn,y=GRS_vals_flattened_nn)
+plt.suptitle("All volc vs. GRS")
+print("\nAll volc vs. GRS")
+
+print('Shapiro volc:') 
+print(shapiro(all_volc_flat_nn))
+
+print('Shapiro GRS:') 
+print(shapiro(GRS_vals_flattened_nn))
+
+print('Normaltest volc:') 
+print(normaltest(all_volc_flat_nn))
+
+print('Normaltest GRS:') 
+print(normaltest(GRS_vals_flattened_nn))
+
+print('Pearson r:') 
+print(pearsonr(all_volc_flat_nn,GRS_vals_flattened_nn))
+
+print('Spearman r:') 
+print(spearmanr(all_volc_flat_nn,GRS_vals_flattened_nn))
+
+
+GRS_box = boxcox(GRS_vals_flattened_nn)
+all_volc_box = boxcox(all_volc_flat_nn)
+sns.jointplot(x=all_volc_box[0],y=GRS_box[0])
+plt.suptitle('all volc vs. GRS : Transformed')
+
+print("\nAll volc vs. GRS : Transformed")
+
+print('Shapiro volc:') 
+print(shapiro(all_volc_box[0]))
+
+print('Shapiro GRS:') 
+print(shapiro(GRS_box[0]))
+
+print('Normaltest volc:') 
+print(normaltest(all_volc_box[0]))
+
+print('Normaltest GRS:') 
+print(normaltest(GRS_box[0]))
+
+print('Pearson r:') 
+print(pearsonr(all_volc_box[0],GRS_box[0]))
+
+print('Spearman r:') 
+print(spearmanr(all_volc_box[0],GRS_box[0]))
+
+
+
+
+Apollinaris = volc_1_dict['Apollinaris_Patera'].flatten()
+Apollinaris_nn = Apollinaris[~np.isnan(GRS_vals_flattened)]
+Apollinaris_box = boxcox(Apollinaris_nn)
+sns.jointplot(x=Apollinaris_nn,y=GRS_vals_flattened_nn)
+plt.suptitle('Apollinaris vs. GRS')
+
+print("\nApollinaris vs. GRS")
+
+print('Shapiro volc:') 
+print(shapiro(Apollinaris_nn))
+
+print('Shapiro GRS:') 
+print(shapiro(GRS_vals_flattened_nn))
+
+print('Normaltest volc:') 
+print(normaltest(Apollinaris_nn))
+
+print('Normaltest GRS:') 
+print(normaltest(GRS_vals_flattened_nn))
+
+print('Pearson r:') 
+print(pearsonr(Apollinaris_nn,GRS_vals_flattened_nn))
+
+print('Spearman r:') 
+print(spearmanr(Apollinaris_nn,GRS_vals_flattened_nn))
+
+sns.jointplot(x=Apollinaris_box[0],y=GRS_box[0])
+plt.suptitle('Apollinaris vs. GRS : Transformed')
+
+print("\nApollinaris vs. GRS : Transformed")
+
+print('Shapiro volc:') 
+print(shapiro(Apollinaris_box[0]))
+
+print('Shapiro GRS:') 
+print(shapiro(GRS_box[0]))
+
+print('Normaltest volc:') 
+print(normaltest(Apollinaris_box[0]))
+
+print('Normaltest GRS:') 
+print(normaltest(GRS_box[0]))
+
+print('Pearson r:') 
+print(pearsonr(Apollinaris_box[0],GRS_box[0]))
+
+print('Spearman r:') 
+print(spearmanr(Apollinaris_box[0],GRS_box[0]))
+
+
+
+fig,ax = plt.subplots()
+probplot(all_volc_flat_nn,plot=ax)
+# probplot(all_volc_box[0],plot=ax)
+
+fig2,ax2 = plt.subplots()
+probplot(GRS_vals_flattened_nn,plot=ax2)
+
+# fig,ax = plt.subplots()
+# ax.scatter(all_volc_flat_nn,GRS_vals_flattened_nn)
+
+# fig2,ax2 = plt.subplots()
+# ax2.hist(all_volc_flat_nn)
+
+# fig3,ax3 = plt.subplots()
+# ax3.hist(GRS_vals_flattened_nn)
+
+
+# ax3.hist(GRS_vals_flattened_trans)
+
+# For only best volcs
+best_set = ['Apollinaris_Patera','Cerberus','Olympus_Mons','Pavonis_Mons','Ascraeus_Mons','Syrtis_Major','Tyrrhenia_Patera','Alba_Patera','Siloe_Patera']
+best_volc_sum = np.zeros([36,72])
+for volc_name in best_set:
+    temp = volc_1_dict[volc_name]
+    best_volc_sum += temp
+    
+
+best_volc_flat = best_volc_sum.flatten()
+best_volc_flat_nn = best_volc_flat[~np.isnan(GRS_vals_flattened)]
+
+fig3,ax3 = plt.subplots()
+probplot(best_volc_flat_nn,plot=ax3)
 
 # Initialize empty lists for r and Shapiro-Wilks values
 r_volc_1 = []
@@ -207,12 +354,6 @@ temp_xarr = cf.arr_to_xarr(best_volc_sum,GRS_lats,GRS_lons,"volc_1_surf_norm")
 gdf = cf.xr_to_geodf(temp_xarr,"ESRI:104971")
 gdf.to_file('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\best_volcs.gpkg',driver="GPKG")
 
-
-# For all volcs
-all_volc_sum = np.zeros([36,72])
-for volc_name in p_set[-1]:
-    temp = volc_1_dict[volc_name]
-    all_volc_sum += temp
 
 sm.qqplot(GRS_vals_flattened)
 

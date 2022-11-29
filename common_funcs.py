@@ -41,9 +41,11 @@ def transformation_test(arr):
         sp_vals.append(sp)
     return sp_vals[np.argmax(p_vals)], np.max(p_vals), lambdas[np.argmax(p_vals)]
 
+
+
 def get_r_val(volc_dep,GRS_dat):
     # Reshape to flat array
-    volc_dep_flat = volc_dep.reshape(volc_dep.size)
+    volc_dep_flat = volc_dep.flatten()
     # Remove nans from both arrays
     volc_dep_flat_nn = volc_dep_flat[~np.isnan(GRS_dat)]
     GRS_dat_flat_nn = GRS_dat[~np.isnan(GRS_dat)]
@@ -75,6 +77,6 @@ def GRS_wrangle(df):
 
     # Interpolate (really just reshape) GRS data to meshgrid
     data_grd = griddata((df['lon_180'].to_numpy(),df['CenterLat'].to_numpy()),df['Concentration'].to_numpy(),(lon_grid,lat_grid),method='nearest')
-    data_flat = data_grd.reshape(data_grd.size)
+    data_flat = data_grd.flatten()
     
     return lats,lons,data_flat,data_grd
