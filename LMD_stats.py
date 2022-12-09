@@ -6,13 +6,14 @@ import common_funcs as cf
 import seaborn as sns
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 from scipy.stats import shapiro, boxcox, probplot, pearsonr, spearmanr, normaltest
 
 # Start timer
 t0 = time.time()
 
 # Change directory to data directory
-os.chdir('LMD_MATHAM_Utils/data')
+os.chdir('data')
 
 # Read in volcano location data
 df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia.csv')
@@ -53,6 +54,7 @@ tracer_names = ['volc_1_surf']
 
 # Define empty dictionaries for each tracer
 volc_1_dict = {}
+volc_1_dict_flat = {}
 volc_2_dict = {}
 volc_3_dict = {}
 volc_4_dict = {}
@@ -62,6 +64,10 @@ for volc_name in df_volc['Volcano Name']:
     for tracer in tracer_names: 
         if tracer == 'volc_1_surf':
             volc_1_dict[volc_name] = np.load(volc_name + '_' + tracer + '.npy')
+            # temp =  volc_1_dict[volc_name].flatten()
+            # temp2 = boxcox(temp)
+            # temp3 = temp2[0]
+            # volc_1_dict_flat[volc_name] = temp3[~np.isnan(GRS_vals_flattened)]
         elif tracer == 'volc_2_surf':
             volc_2_dict[volc_name] = np.load(volc_name + '_' + tracer + '.npy')
         elif tracer == 'volc_3_surf':
@@ -69,6 +75,10 @@ for volc_name in df_volc['Volcano Name']:
         elif tracer == 'volc_4_surf':
             volc_4_dict[volc_name] = np.load(volc_name + '_' + tracer + '.npy')
         print("done with tracer: "+tracer+" and volcano: " + volc_name)
+
+
+# volc_1_dict_flat_df = pd.DataFrame.from_dict(volc_1_dict_flat)
+
 
 
 # For all volcs
@@ -81,8 +91,17 @@ all_volc_flat = all_volc_sum.flatten()
 all_volc_flat_nn = all_volc_flat[~np.isnan(GRS_vals_flattened)]
 GRS_vals_flattened_nn = GRS_vals_flattened[~np.isnan(GRS_vals_flattened)]
 
+
+# regressor_OLS = sm.OLS(GRS_vals_flattened_nn,volc_1_dict_flat_df.iloc[:]).fit()
+
+# vif = pd.DataFrame()
+# vif['VIF'] = [variance_inflation_factor(volc_1_dict_flat_df.values, i) for i in range(volc_1_dict_flat_df.shape[1])]
+# vif['variable'] = volc_1_dict_flat_df.columns
+
 # Log transformation to become normal(ish)
 GRS_vals_flattened_trans = boxcox(GRS_vals_flattened_nn,0)
+
+
 
 
 sns.jointplot(x=all_volc_flat_nn,y=GRS_vals_flattened_nn)
