@@ -13,7 +13,7 @@ from scipy.stats import shapiro, boxcox, probplot, pearsonr, spearmanr, normalte
 t0 = time.time()
 
 # Change directory to data directory
-os.chdir('data')
+os.chdir('LMD_MATHAM_Utils/data')
 
 # Read in volcano location data
 df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia.csv')
@@ -64,10 +64,10 @@ for volc_name in df_volc['Volcano Name']:
     for tracer in tracer_names: 
         if tracer == 'volc_1_surf':
             volc_1_dict[volc_name] = np.load(volc_name + '_' + tracer + '.npy')
-            # temp =  volc_1_dict[volc_name].flatten()
-            # temp2 = boxcox(temp)
-            # temp3 = temp2[0]
-            # volc_1_dict_flat[volc_name] = temp3[~np.isnan(GRS_vals_flattened)]
+            temp =  volc_1_dict[volc_name].flatten()
+            temp2 = boxcox(temp)
+            temp3 = temp2[0]
+            volc_1_dict_flat[volc_name] = temp3[~np.isnan(GRS_vals_flattened)]
         elif tracer == 'volc_2_surf':
             volc_2_dict[volc_name] = np.load(volc_name + '_' + tracer + '.npy')
         elif tracer == 'volc_3_surf':
@@ -77,7 +77,7 @@ for volc_name in df_volc['Volcano Name']:
         print("done with tracer: "+tracer+" and volcano: " + volc_name)
 
 
-# volc_1_dict_flat_df = pd.DataFrame.from_dict(volc_1_dict_flat)
+volc_1_dict_flat_df = pd.DataFrame.from_dict(volc_1_dict_flat)
 
 
 
@@ -92,7 +92,9 @@ all_volc_flat_nn = all_volc_flat[~np.isnan(GRS_vals_flattened)]
 GRS_vals_flattened_nn = GRS_vals_flattened[~np.isnan(GRS_vals_flattened)]
 
 
-# regressor_OLS = sm.OLS(GRS_vals_flattened_nn,volc_1_dict_flat_df.iloc[:]).fit()
+regressor_OLS = sm.OLS(GRS_vals_flattened_nn,volc_1_dict_flat_df.iloc[:]).fit()
+cls = cf.Linear_Reg_Diagnostic(regressor_OLS)
+fig, ax = cls()
 
 # vif = pd.DataFrame()
 # vif['VIF'] = [variance_inflation_factor(volc_1_dict_flat_df.values, i) for i in range(volc_1_dict_flat_df.shape[1])]
