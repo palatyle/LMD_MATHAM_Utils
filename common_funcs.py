@@ -5,7 +5,7 @@ import geopandas
 from itertools import chain, combinations
 import numpy as np
 from scipy.interpolate import griddata 
-from scipy.stats import shapiro, pearsonr, boxcox
+from scipy.stats import shapiro, pearsonr, boxcox, normaltest
 
 
 def normalize(arr):
@@ -51,9 +51,11 @@ def get_r_val(volc_dep,GRS_dat):
     
     sp = shapiro(volc_dep_flat_trans)
     
+    nt = normaltest(volc_dep_flat_trans)
+    
     r = pearsonr(GRS_dat_flat_nn,volc_dep_flat_trans)
  
-    return r, sp, best_lambda
+    return r, sp, nt, best_lambda
 
 def GRS_wrangle(df):
     # Sort data and drop Center Lon column

@@ -12,7 +12,7 @@ from scipy.stats import shapiro, boxcox, probplot, pearsonr, spearmanr, normalte
 t0 = time.time()
 
 # Change directory to data directory
-os.chdir('data')
+os.chdir('LMD_MATHAM_Utils/data')
 
 # Read in volcano location data
 df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia.csv')
@@ -154,6 +154,11 @@ sp_volc_2 = []
 sp_volc_3 = []
 sp_volc_4 = []
 
+nt_volc_1 = []
+nt_volc_2 = []
+nt_volc_3 = []
+nt_volc_4 = []
+
 lambda_1 = []
 lambda_2 = []
 lambda_3 = []
@@ -184,24 +189,28 @@ for tracer in tracer_names:
                 volc_sum_4 += temp
         # With sum finished, calcualte r and shapiro wilkes test for every summed array
         if tracer == 'volc_1_surf':
-            temp_r, temp_sp, temp_lambda = cf.get_r_val(volc_sum_1,GRS_vals_flattened)
+            temp_r, temp_sp, temp_nt, temp_lambda = cf.get_r_val(volc_sum_1,GRS_vals_flattened)
             r_volc_1.append(temp_r)
             sp_volc_1.append(temp_sp)
+            nt_volc_1.append(temp_nt)
             lambda_1.append(temp_lambda)
         elif tracer == 'volc_2_surf':
-            temp_r, temp_sp, temp_lambda = cf.get_r_val(volc_sum_2,GRS_vals_flattened)
+            temp_r, temp_sp, temp_nt, temp_lambda = cf.get_r_val(volc_sum_2,GRS_vals_flattened)
             r_volc_2.append(temp_r)
             sp_volc_2.append(temp_sp)
+            nt_volc_2.append(temp_nt)
             lambda_2.append(temp_lambda)
         elif tracer == 'volc_3_surf':
-            temp_r, temp_sp, temp_lambda  = cf.get_r_val(volc_sum_3,GRS_vals_flattened)
+            temp_r, temp_sp, temp_nt, temp_lambda  = cf.get_r_val(volc_sum_3,GRS_vals_flattened)
             r_volc_3.append(temp_r)
             sp_volc_3.append(temp_sp)
+            nt_volc_3.append(temp_nt)
             lambda_3.append(temp_lambda)
         elif tracer == 'volc_4_surf':
-            temp_r, temp_sp, temp_lambda  = cf.get_r_val(volc_sum_4,GRS_vals_flattened)
+            temp_r, temp_sp, temp_nt, temp_lambda  = cf.get_r_val(volc_sum_4,GRS_vals_flattened)
             r_volc_4.append(temp_r)
             sp_volc_4.append(temp_sp)
+            nt_volc_4.append(temp_nt)
             lambda_4.append(temp_lambda)
     print("tracer: " + tracer +" set: " + str(count) + '/' + str(len(p_set)))
 
@@ -209,8 +218,9 @@ t1 = time.time()
 
 r_volc_1_df = pd.DataFrame(r_volc_1,columns=['r_val','r-p_val'])
 sp_volc_1_df = pd.DataFrame(sp_volc_1,columns=['sp_val','sp-p_val'])
+nt_volc_1_df = pd.DataFrame(nt_volc_1,columns=['nt_val','nt-p_val'])
 lambda_1_df = pd.DataFrame(lambda_1,columns=['lambda'])
-df_volc_1 = pd.concat([r_volc_1_df,sp_volc_1_df,lambda_1_df],axis=1)
+df_volc_1 = pd.concat([r_volc_1_df,sp_volc_1_df,nt_volc_1_df,lambda_1_df],axis=1)
 
 
 # r_volc_2_df = pd.DataFrame(r_volc_2,columns=['r_val','r-p_val'])
@@ -235,16 +245,27 @@ df_volc_1 = pd.concat([r_volc_1_df,sp_volc_1_df,lambda_1_df],axis=1)
 # best_set_df = pd.merge(best_set_df,df_volc[["Volcano Name","lat","lon"]],on="Volcano Name",how="left")
 # best_set_df.to_csv('best_volcs.csv')
 
-
+print("Highest R vals:")
 best_sets = [p_set[i] for i in list(df_volc_1.r_val.nlargest(15).index)]
 print(*best_sets,sep='\n')
 print(df_volc_1.iloc[list(df_volc_1.r_val.nlargest(15).index)])
 
 
-best_sets_normal = [p_set[i] for i in list(df_volc_1[df_volc_1['sp-p_val']>0.05].r_val.nlargest(15).index)]
+alpha = 0.05
 
-print(*best_sets_normal,sep='\n')
-print(df_volc_1.iloc[list(df_volc_1[df_volc_1['sp-p_val']>0.05].r_val.nlargest(15).index)])
+print("Highest R vals with shapiro p val > .05:")
+best_sets_sp = [p_set[i] for i in list(df_volc_1[df_volc_1['sp-p_val']>alpha].r_val.nlargest(15).index)]
+
+print(*best_sets_sp,sep='\n')
+print(df_volc_1.iloc[list(df_volc_1[df_volc_1['sp-p_val']>alpha].r_val.nlargest(15).index)])
+
+
+
+print("Highest R vals with D'Agostino p val > .05:")
+best_sets_sp = [p_set[i] for i in list(df_volc_1[df_volc_1['nt-p_val']>alpha].r_val.nlargest(15).index)]
+
+print(*best_sets_sp,sep='\n')
+print(df_volc_1.iloc[list(df_volc_1[df_volc_1['nt-p_val']>alpha].r_val.nlargest(15).index)])
 
 
 
