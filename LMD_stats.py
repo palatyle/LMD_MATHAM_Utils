@@ -90,9 +90,10 @@ for volc_name in p_set[-1]:
 all_volc_flat = all_volc_sum.flatten()
 all_volc_flat_nn = all_volc_flat[~np.isnan(GRS_vals_flattened)]
 GRS_vals_flattened_nn = GRS_vals_flattened[~np.isnan(GRS_vals_flattened)]
+GRS_vals_flattened_trans = boxcox(GRS_vals_flattened_nn,0)
 
 
-regressor_OLS = sm.OLS(GRS_vals_flattened_nn,volc_1_dict_flat_df.iloc[:]).fit()
+regressor_OLS = sm.OLS(GRS_vals_flattened_trans,volc_1_dict_flat_df.iloc[:]).fit()
 cls = cf.Linear_Reg_Diagnostic(regressor_OLS)
 fig, ax = cls()
 
@@ -101,7 +102,6 @@ fig, ax = cls()
 # vif['variable'] = volc_1_dict_flat_df.columns
 
 # Log transformation to become normal(ish)
-GRS_vals_flattened_trans = boxcox(GRS_vals_flattened_nn,0)
 
 
 

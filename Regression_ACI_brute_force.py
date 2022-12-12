@@ -14,7 +14,7 @@ from scipy.stats import shapiro, boxcox, probplot, pearsonr, spearmanr, normalte
 t0 = time.time()
 
 # Change directory to data directory
-os.chdir('data')
+os.chdir('LMD_MATHAM_Utils/data')
 
 # Read in volcano location data
 df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia.csv')
@@ -67,7 +67,7 @@ AIC = []
 summary_stat = []
 
 for count,set_loop in enumerate(p_set):
-    regressor_OLS = sm.OLS(GRS_vals_flattened_trans,volc_1_dict_flat_df[list(set_loop)].assign(intercept=1)).fit()
+    # regressor_OLS = sm.OLS(GRS_vals_flattened_trans,volc_1_dict_flat_df[list(set_loop)].assign(intercept=1)).fit()
     regressor_OLS = sm.OLS(GRS_vals_flattened_trans,sm.add_constant(volc_1_dict_flat_df[list(set_loop)])).fit()
     AIC.append(regressor_OLS.aic)
     summary_stat.append(regressor_OLS.summary())
