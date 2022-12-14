@@ -304,7 +304,8 @@ def transformation_test(arr):
     
     return arr_trans,lamb
 
-
+def matchingKeys(dictionary, searchString):
+    return [key for key,val in dictionary.items() if any(searchString in s for s in val)]
 
 def get_r_val(volc_dep,GRS_dat):
     # Reshape to flat array

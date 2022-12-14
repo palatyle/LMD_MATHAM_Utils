@@ -5,6 +5,7 @@ import time
 import common_funcs as cf
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 import statsmodels.api as sm
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from scipy.stats import shapiro, boxcox, probplot, pearsonr, spearmanr, normaltest
@@ -14,7 +15,7 @@ from scipy.stats import shapiro, boxcox, probplot, pearsonr, spearmanr, normalte
 t0 = time.time()
 
 # Change directory to data directory
-os.chdir('LMD_MATHAM_Utils/data')
+os.chdir('data')
 
 # Read in volcano location data
 df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia.csv')
@@ -42,11 +43,21 @@ volc_2_dict = {}
 volc_3_dict = {}
 volc_4_dict = {}
 
+
+prev_max = 0
+prev_min = 1e16
 # Loop through all separate GCM outputs and read in. For each volcanic tracer, interpolate from the GCM grid to the GRS grid
-for volc_name in df_volc['Volcano Name']:
+for cnt,volc_name in enumerate(df_volc['Volcano Name']):
     for tracer in tracer_names: 
         if tracer == 'volc_1_surf':
             volc_1_dict[volc_name] = np.load(volc_name + '_' + tracer + '.npy')
+            max_val = np.max(volc_1_dict[volc_name])
+            
+            if max_val > prev_max:
+                prev_max = max_val
+            min_val = np.min(volc_1_dict[volc_name])
+            if min_val < prev_min:
+                prev_min = min_val
             temp =  volc_1_dict[volc_name].flatten()
             temp2 = boxcox(temp)
             temp3 = temp2[0]
@@ -59,8 +70,50 @@ for volc_name in df_volc['Volcano Name']:
         elif tracer == 'volc_4_surf':
             volc_4_dict[volc_name] = np.load(volc_name + '_' + tracer + '.npy')
         print("done with tracer: "+tracer+" and volcano: " + volc_name)
+fig,axs = plt.subplots(5,4,sharex=True,sharey=True)
+axs=axs.flatten()
+for cnt,volc_name in enumerate(df_volc['Volcano Name']):
+    im=axs[cnt].pcolormesh(GRS_lons,GRS_lats,volc_1_dict[volc_name],norm=colors.LogNorm())
+    axs[cnt].set_title(volc_name)
+    axs[cnt].grid(True)
+fig.colorbar(im,ax=axs.ravel().tolist())
+all_volc_sum = np.zeros([36,72])
+for volc_name in p_set[-1]:
+    temp = volc_1_dict[volc_name]
+    all_volc_sum += temp
+
+im=axs[-1].pcolormesh(GRS_lons,GRS_lats,GRS_grid)
+axs[-1].set_title("GRS")
+axs[-1].grid(True)
 
 
+
+
+fig1,axs1 = plt.subplots(5,4,sharex=True,sharey=True)
+axs1=axs1.flatten()
+for cnt,volc_name in enumerate(df_volc['Volcano Name']):
+    im=axs1[cnt].pcolormesh(GRS_lons,GRS_lats,volc_1_dict[volc_name])
+    axs1[cnt].set_title(volc_name)
+    axs1[cnt].grid(True)
+    plt.colorbar(im, ax=axs1[cnt])
+# fig1.colorbar(im,ax=axs1.ravel().tolist())
+all_volc_sum = np.zeros([36,72])
+for volc_name in p_set[-1]:
+    temp = volc_1_dict[volc_name]
+    all_volc_sum += temp
+
+im=axs1[-1].pcolormesh(GRS_lons,GRS_lats,GRS_grid)
+axs1[-1].set_title("GRS")
+axs1[-1].grid(True)
+
+plt.colorbar(im,ax=axs1[-1])
+
+
+fig2,ax2 = plt.subplots()
+im = ax2.pcolormesh(GRS_lons,GRS_lats,all_volc_sum,norm=colors.LogNorm())
+ax2.grid(True)
+plt.colorbar(im,ax=ax2)
+plt.show()
 volc_1_dict_flat_df = pd.DataFrame.from_dict(volc_1_dict_flat)
 
 AIC = []

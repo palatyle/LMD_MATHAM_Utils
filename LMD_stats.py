@@ -13,7 +13,7 @@ from scipy.stats import shapiro, boxcox, probplot, pearsonr, spearmanr, normalte
 t0 = time.time()
 
 # Change directory to data directory
-os.chdir('LMD_MATHAM_Utils/data')
+os.chdir('data')
 
 # Read in volcano location data
 df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia.csv')
@@ -28,6 +28,16 @@ df_GRS = pd.read_csv('GRS_data_raw_180.csv')
 # Wrangle GRS data into list of lats + lons + full array flattened (for use in correlation calc)
 GRS_lats,GRS_lons,GRS_vals_flattened,GRS_grid = cf.GRS_wrangle(df_GRS)
 
+
+groups_dict = {}
+
+groups_dict['Tharsis'] = ['Olympus_Mons','Alba_Patera','Ascraeus_Mons','Pavonis_Mons','Arsia_Mons']
+groups_dict['Arabia'] = ['Eden_Patera','Siloe_Patera','Ismenia_Oxus']
+groups_dict['Hellas'] = ['Amphritites','Peneus_Patera','Pityusa_Patera','Malea_Patera']
+groups_dict['Hadriaca_Tyrrhenia'] = ['Hadriaca_Patera','Tyrrhenia_Patera']
+groups_dict['Elysium_Hecates'] = ['Elysium_Mons','Hecates']
+groups_dict['Syrtis_Major'] = ['Syrtis_Major']
+groups_dict['Cerberus_Apollinaris_Electris'] = ['Cerberus','Apollinaris_Patera',"Electris"]
 # GRS_vals_flattened = GRS_vals_flattened[~np.isnan(GRS_vals_flattened)]
 
 # fig,ax = plt.subplots(3,2)
@@ -67,7 +77,7 @@ for volc_name in df_volc['Volcano Name']:
             temp =  volc_1_dict[volc_name].flatten()
             temp2 = boxcox(temp)
             temp3 = temp2[0]
-            volc_1_dict_flat[volc_name] = temp3[~np.isnan(GRS_vals_flattened)]
+            volc_1_dict_flat[volc_name] = temp[~np.isnan(GRS_vals_flattened)]
         elif tracer == 'volc_2_surf':
             volc_2_dict[volc_name] = np.load(volc_name + '_' + tracer + '.npy')
         elif tracer == 'volc_3_surf':
@@ -93,76 +103,78 @@ GRS_vals_flattened_nn = GRS_vals_flattened[~np.isnan(GRS_vals_flattened)]
 GRS_vals_flattened_trans = boxcox(GRS_vals_flattened_nn,0)
 
 
-regressor_OLS = sm.OLS(GRS_vals_flattened_trans,volc_1_dict_flat_df.iloc[:]).fit()
-cls = cf.Linear_Reg_Diagnostic(regressor_OLS)
-fig, ax = cls()
-
-# vif = pd.DataFrame()
-# vif['VIF'] = [variance_inflation_factor(volc_1_dict_flat_df.values, i) for i in range(volc_1_dict_flat_df.shape[1])]
-# vif['variable'] = volc_1_dict_flat_df.columns
-
-# Log transformation to become normal(ish)
-
-
-
-
-sns.jointplot(x=all_volc_flat_nn,y=GRS_vals_flattened_nn)
-plt.suptitle("All volc vs. GRS")
-print("\nAll volc vs. GRS")
-
-print('Shapiro volc:') 
-print(shapiro(all_volc_flat_nn))
-
-print('Shapiro GRS:') 
-print(shapiro(GRS_vals_flattened_nn))
-
-print('Normaltest volc:') 
-print(normaltest(all_volc_flat_nn))
-
-print('Normaltest GRS:') 
-print(normaltest(GRS_vals_flattened_nn))
-
-print('Pearson r:') 
-print(pearsonr(all_volc_flat_nn,GRS_vals_flattened_nn))
-
-GRS_box = boxcox(GRS_vals_flattened_nn)
-all_volc_box = boxcox(all_volc_flat_nn)
-sns.jointplot(x=all_volc_box[0],y=GRS_box[0])
-plt.suptitle('all volc vs. GRS : Transformed')
-
-print("\nAll volc vs. GRS : Transformed")
-
-print('Shapiro volc:') 
-print(shapiro(all_volc_box[0]))
-
-print('Shapiro GRS:') 
-print(shapiro(GRS_box[0]))
-
-print('Normaltest volc:') 
-print(normaltest(all_volc_box[0]))
-
-print('Normaltest GRS:') 
-print(normaltest(GRS_box[0]))
-
-print('Pearson r:') 
-print(pearsonr(all_volc_box[0],GRS_box[0]))
-
-
-
-
 # For only best volcs
-best_set = ['Apollinaris_Patera','Cerberus','Olympus_Mons','Pavonis_Mons','Ascraeus_Mons','Syrtis_Major','Tyrrhenia_Patera','Alba_Patera','Siloe_Patera']
+best_set = ['Apollinaris_Patera','Eden_Patera','Siloe_Patera','Ismenia_Oxus','Syrtis_Major','Electris']
 best_volc_sum = np.zeros([36,72])
 for volc_name in best_set:
     temp = volc_1_dict[volc_name]
     best_volc_sum += temp
     
 
-best_volc_flat = best_volc_sum.flatten()
-best_volc_flat_nn = best_volc_flat[~np.isnan(GRS_vals_flattened)]
+regressor_OLS = sm.OLS(GRS_vals_flattened_trans,volc_1_dict_flat_df.iloc[:]).fit()
+cls = cf.Linear_Reg_Diagnostic(regressor_OLS)
+fig, ax = cls()
 
-fig3,ax3 = plt.subplots()
-probplot(best_volc_flat_nn,plot=ax3)
+vif = pd.DataFrame()
+volc_1_dict_flat_df = sm.add_constant(volc_1_dict_flat_df)
+vif['VIF'] = [variance_inflation_factor(volc_1_dict_flat_df.values, i) for i in range(volc_1_dict_flat_df.shape[1])]
+vif['variable'] = volc_1_dict_flat_df.columns
+
+# Log transformation to become normal(ish)
+
+
+
+
+# sns.jointplot(x=all_volc_flat_nn,y=GRS_vals_flattened_nn)
+# plt.suptitle("All volc vs. GRS")
+# print("\nAll volc vs. GRS")
+
+# print('Shapiro volc:') 
+# print(shapiro(all_volc_flat_nn))
+
+# print('Shapiro GRS:') 
+# print(shapiro(GRS_vals_flattened_nn))
+
+# print('Normaltest volc:') 
+# print(normaltest(all_volc_flat_nn))
+
+# print('Normaltest GRS:') 
+# print(normaltest(GRS_vals_flattened_nn))
+
+# print('Pearson r:') 
+# print(pearsonr(all_volc_flat_nn,GRS_vals_flattened_nn))
+
+# GRS_box = boxcox(GRS_vals_flattened_nn)
+# all_volc_box = boxcox(all_volc_flat_nn)
+# sns.jointplot(x=all_volc_box[0],y=GRS_box[0])
+# plt.suptitle('all volc vs. GRS : Transformed')
+
+# print("\nAll volc vs. GRS : Transformed")
+
+# print('Shapiro volc:') 
+# print(shapiro(all_volc_box[0]))
+
+# print('Shapiro GRS:') 
+# print(shapiro(GRS_box[0]))
+
+# print('Normaltest volc:') 
+# print(normaltest(all_volc_box[0]))
+
+# print('Normaltest GRS:') 
+# print(normaltest(GRS_box[0]))
+
+# print('Pearson r:') 
+# print(pearsonr(all_volc_box[0],GRS_box[0]))
+
+
+
+
+
+# best_volc_flat = best_volc_sum.flatten()
+# best_volc_flat_nn = best_volc_flat[~np.isnan(GRS_vals_flattened)]
+
+# fig3,ax3 = plt.subplots()
+# probplot(best_volc_flat_nn,plot=ax3)
 
 # Initialize empty lists for r and Shapiro-Wilks values
 r_volc_1 = []
@@ -188,14 +200,14 @@ lambda_4 = []
 # Loop through the 4 volcanic tracers
 for tracer in tracer_names:
     # Loop through the superset
-    for count, set in enumerate(p_set):
+    for count, set_volc in enumerate(p_set):
         # Initialize the sum array with zeros (this should reset for every set of the superset)
         volc_sum_1 = np.zeros([36,72])
         volc_sum_2 = np.zeros([36,72])
         volc_sum_3 = np.zeros([36,72])
         volc_sum_4 = np.zeros([36,72])
         # Loop through each volcano name in each set and normalize the data and sum if more than 1 volcano is present in set. 
-        for name in set:
+        for name in set_volc:
             if tracer == 'volc_1_surf':
                 temp = volc_1_dict[name]
                 volc_sum_1 += temp
@@ -275,12 +287,20 @@ print(df_volc_1.iloc[list(df_volc_1.r_val.nlargest(15).index)])
 alpha = 0.05
 
 print("Highest R vals with shapiro p val > .05:")
-best_sets_sp = [p_set[i] for i in list(df_volc_1[df_volc_1['sp-p_val']>alpha].r_val.nlargest(15).index)]
+best_sets_sp = [p_set[i] for i in list(df_volc_1[df_volc_1['sp-p_val']>alpha].r_val.nlargest(500).index)]
 
-print(*best_sets_sp,sep='\n')
+# print(*best_sets_sp,sep='\n')
 print(df_volc_1.iloc[list(df_volc_1[df_volc_1['sp-p_val']>alpha].r_val.nlargest(15).index)])
 
+final_groups = []
+for volc_set in best_sets_sp:
+    group = []
+    for volc in volc_set:
+        group.append(cf.matchingKeys(groups_dict,volc)[0])
+    group = set(group)
+    final_groups.append(group)
 
+unique_groups = set(final_groups)
 
 print("Highest R vals with D'Agostino p val > .05:")
 best_sets_sp = [p_set[i] for i in list(df_volc_1[df_volc_1['nt-p_val']>alpha].r_val.nlargest(15).index)]
