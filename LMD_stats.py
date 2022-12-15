@@ -16,7 +16,7 @@ t0 = time.time()
 os.chdir('data')
 
 # Read in volcano location data
-df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia.csv')
+df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia_no_AC.csv')
 
 # Create powerset of all volcano combinations
 p_set = list(cf.powerset(df_volc['Volcano Name']))
@@ -289,7 +289,7 @@ alpha = 0.05
 print("Highest R vals with shapiro p val > .05:")
 best_sets_sp = [p_set[i] for i in list(df_volc_1[df_volc_1['sp-p_val']>alpha].r_val.nlargest(500).index)]
 
-# print(*best_sets_sp,sep='\n')
+print(*best_sets_sp,sep='\n')
 print(df_volc_1.iloc[list(df_volc_1[df_volc_1['sp-p_val']>alpha].r_val.nlargest(15).index)])
 
 final_groups = []
@@ -300,7 +300,7 @@ for volc_set in best_sets_sp:
     group = set(group)
     final_groups.append(group)
 
-unique_groups = set(final_groups)
+# unique_groups = set(final_groups)
 
 print("Highest R vals with D'Agostino p val > .05:")
 best_sets_sp = [p_set[i] for i in list(df_volc_1[df_volc_1['nt-p_val']>alpha].r_val.nlargest(15).index)]

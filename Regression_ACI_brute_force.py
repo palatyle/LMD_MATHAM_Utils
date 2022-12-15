@@ -18,7 +18,7 @@ t0 = time.time()
 os.chdir('data')
 
 # Read in volcano location data
-df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia.csv')
+df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia_no_AC.csv')
 
 # Create powerset of all volcano combinations
 p_set = list(cf.powerset(df_volc['Volcano Name']))

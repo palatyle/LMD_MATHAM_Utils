@@ -307,6 +307,10 @@ def transformation_test(arr):
 def matchingKeys(dictionary, searchString):
     return [key for key,val in dictionary.items() if any(searchString in s for s in val)]
 
+
+# def remove_nans(arr,arr_template):
+    
+
 def get_r_val(volc_dep,GRS_dat):
     # Reshape to flat array
     volc_dep_flat = volc_dep.flatten()

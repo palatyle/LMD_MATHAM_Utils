@@ -9,25 +9,25 @@ from scipy.interpolate import RegularGridInterpolator
 import common_funcs as cf
 import plotly.express as px
 
-os.chdir('D:\\')
+os.chdir('data')
 
 # Read in volcano location data
-df_volc = pd.read_csv('Mars_Volc_locs_no_arsia.csv')
+df_volc = pd.read_csv('Mars_Volc_locs_no_arsia_no_AC.csv')
 # Create powerset of all volcano combinations
 p_set = list(cf.powerset(df_volc['Volcano Name']))
 p_set.pop(0) #Removes first element which is empty 
 
 # Read in GRS data
-df_GRS = pd.read_csv('C:\\Users\\palatyle\\Documents\\LMD_MATHAM_Utils\\data\\GRS_data_raw_180.csv')
+df_GRS = pd.read_csv('GRS_data_raw_180.csv')
 
 GRS_lats,GRS_lons,GRS_vals_flattened,GRS_grid = cf.GRS_wrangle(df_GRS)
-prev_max = 0
-prev_min = 1e16
+
+GRS_masked = np.ma.masked_invalid(GRS_grid)
+
 volc_1_dict = {}
 for cnt,volc_name in enumerate(df_volc['Volcano Name']):
-    volc_1_dict[volc_name] = xr.open_dataset('indv_volcs\\'+'diagfi_volc_filt_nccomp_'+volc_name+'.nc',mask_and_scale=False,decode_times=False)
-    if cnt == 0:
-        volc_lons,volc_lats = np.meshgrid(volc_1_dict[volc_name].longitude,volc_1_dict[volc_name].latitude)
+    # volc_1_dict[volc_name] = xr.open_dataset('indv_volcs\\'+'diagfi_volc_filt_nccomp_'+volc_name+'.nc',mask_and_scale=False,decode_times=False)
+    volc_1_dict[volc_name] = np.load(volc_name + '_volc_1_surf'  + '.npy')
         
         
 
@@ -35,7 +35,7 @@ for cnt,volc_name in enumerate(df_volc['Volcano Name']):
 fig,axs = plt.subplots(5,4,sharex=True,sharey=True)
 axs=axs.flatten()
 for cnt,volc_name in enumerate(df_volc['Volcano Name']):
-    im=axs[cnt].pcolormesh(volc_lons,volc_lats,volc_1_dict[volc_name].volc_1_surf[-1,:,:],norm=colors.LogNorm())
+    im=axs[cnt].contourf(GRS_lons,GRS_lats,np.ma.masked_array(volc_1_dict[volc_name],GRS_masked.mask),levels = [0.00001e13,.00005e13,.0001e13,.0005e13,.001e13,.005e13,.01e13,.05e13,.1e13,.5e13,1e13],norm=colors.LogNorm())
     axs[cnt].set_title(volc_name)
     axs[cnt].grid(True)
 fig.colorbar(im,ax=axs.ravel().tolist())
@@ -55,7 +55,7 @@ ax_GRS.grid(True)
 fig1,axs1 = plt.subplots(5,4,sharex=True,sharey=True)
 axs1=axs1.flatten()
 for cnt,volc_name in enumerate(df_volc['Volcano Name']):
-    im=axs1[cnt].pcolormesh(volc_lons,volc_lats,volc_1_dict[volc_name].volc_1_surf[-1,:,:])
+    im=axs1[cnt].pcolormesh(GRS_lons,GRS_lats,np.ma.masked_array(volc_1_dict[volc_name],GRS_masked.mask))
     axs1[cnt].set_title(volc_name)
     axs1[cnt].grid(True)
     plt.colorbar(im, ax=axs1[cnt])
@@ -64,22 +64,22 @@ for cnt,volc_name in enumerate(df_volc['Volcano Name']):
 
 
 
-all_volc_sum = np.zeros([97,129])
+all_volc_sum = np.zeros([36,72])
 for volc_name in p_set[-1]:
-    temp = volc_1_dict[volc_name].volc_1_surf[-1,:,:]
+    temp = volc_1_dict[volc_name]
     all_volc_sum += temp
 
 fig2,ax2 = plt.subplots()
-im = ax2.pcolormesh(volc_lons,volc_lats,all_volc_sum,norm=colors.LogNorm())
+im = ax2.pcolormesh(GRS_lons,GRS_lats,np.ma.masked_array(volc_1_dict[volc_name],GRS_masked.mask),norm=colors.LogNorm())
 ax2.grid(True)
 plt.colorbar(im,ax=ax2)
 plt.show()
 
 
-volc1_log = np.log10(volc_1_dict["Hadriaca_Patera"].volc_1_surf)
+volc1_log = np.log10(volc_1_dict["Hadriaca_Patera"])
 log_min = float(volc1_log.min())
 log_max = float(volc1_log.max())
-plfig = px.imshow(volc_1_dict["Hadriaca_Patera"].volc_1_surf, animation_frame='Time')
+plfig = px.imshow(volc_1_dict["Hadriaca_Patera"], animation_frame='Time')
 plfig.show()
 
 # Read in one LMD GCM output file ot grab lat/lon geo and create a meshgrid
