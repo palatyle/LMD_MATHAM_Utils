@@ -1,18 +1,39 @@
-import netCDF4 as nc
-import numpy as np
 import argparse
 
+import netCDF4 as nc
+import numpy as np
+
+
 def import_netcdf_obj(filename):
-    '''
-    Input: filename
-    Outputs: netcdf data object
-    '''
+    """Function to import netcdf file
+
+    Parameters
+    ----------
+    filename : str
+        path to netcdf file
+
+    Returns
+    -------
+    netcdf data object
+        netcdf data object
+    """    
     return nc.Dataset(filename)
 
 def import_geometry(ds):
-    '''
-    Returns x, y, z dimensions from netcdf file. 
-    '''
+    """Returns x, y, z dimensions from netcdf file.
+
+    Parameters
+    ----------
+    ds : netcdf data object
+        netcdf data object
+
+    Returns
+    -------
+    xvar : array
+    yvar : array
+    zvar : array
+        x, y, z dimensions
+    """    
     xvar = m2km(ds.variables['x'][:])
     yvar = m2km(ds.variables['y'][:])
     zvar = m2km(ds.variables['z'][:])
@@ -20,16 +41,50 @@ def import_geometry(ds):
     return xvar, yvar, zvar 
 
 def m2km(dim_length):
-    '''
-    Returns input m length value to km
-    '''
+    """Converts meters to kilometers
+
+    Parameters
+    ----------
+    dim_length : num/arr
+        length in meters
+
+    Returns
+    -------
+    num/arr
+        length in kilometers
+    """
     return dim_length/1000
 
 def get_timestep_val(ds):
+    """Returns time array from netcdf file.
+
+    Parameters
+    ----------
+    ds : netcdf data object
+        netcdf data object
+
+    Returns
+    -------
+    array
+        time array
+    """    
     return ds.variables['time'][:]
 
 def import_tracer(ds,tracer_name):
-    
+    """Imports tracer from netcdf file based on tracer name.
+
+    Parameters
+    ----------
+    ds : netcdf data object
+        netcdf data object
+    tracer_name : str
+        name of tracer
+
+    Returns
+    -------
+    array
+        tracer array
+    """    
     tracer_nc = ds.variables[tracer_name]
     tracer_np = np.array(tracer_nc)
     tracer_np[tracer_np == tracer_nc._FillValue] = 0
@@ -38,14 +93,19 @@ def import_tracer(ds,tracer_name):
 
 
 def row_sum_ts(ash_var):
-    """_summary_
+    """sums the 4D ash tracer array row wise and returns a 2D vertical profile
+    array of the sum per timestep
 
-    Args:
-        ash_var (_type_): _description_
+    Parameters
+    ----------
+    ash_var : 4D array
+        ash tracer array
 
-    Returns:
-        _type_: _description_
-    """    
+    Returns
+    -------
+    2D array
+        vertical profile array of the ash sum per timestep
+    """
     
     domain_exit1 = np.squeeze(ash_var[:,0,:]) # side
     domain_exit2 = np.squeeze(ash_var[:,-1,:]) # side
@@ -67,29 +127,45 @@ def row_sum_ts(ash_var):
     return row_sum
 
 def sum_remaining_ash(ash_var):
-    """_summary_
+    """sums the last timestep of the ash tracer array and returns 
+    a 1D array of the remaining ash in the model domain
 
-    Args:
-        ash_var (_type_): _description_
+    Parameters
+    ----------
+    ash_var : 3D array
+        ash tracer array
 
-    Returns:
-        _type_: _description_
-    """    
+    Returns
+    -------
+    1D array
+        array of the remaining ash in the model domain
+    """
     return np.sum(np.sum(ash_var,axis=1),axis=1)
     
 
 
 def domain_flux_calc(ash_var1,ash_var2,ash_var3,ash_var4,z_var,time_array,fname):
-    """_summary_
+    """Calculates the flux of ash out of the domain per timestep and 
+    remaining ash at last timestep. Outputs a 1D profile text file of
+    each ash tracer as a column.
 
-    Args:
-        ash_var1 (_type_): _description_
-        ash_var2 (_type_): _description_
-        ash_var3 (_type_): _description_
-        ash_var4 (_type_): _description_
-        z_var (_type_): _description_
-        time_array (_type_): _description_
-    """    
+    Parameters
+    ----------
+    ash_var1 : array
+        ash tracer array
+    ash_var2 : array
+        ash tracer array
+    ash_var3 : array
+        ash tracer array
+    ash_var4 : array
+        ash tracer array
+    z_var : array
+        z dimension array
+    time_array : array
+        time array
+    fname : str
+        output filename
+    """
     ash1_row_ts = []
     ash2_row_ts = []
     ash3_row_ts = []
@@ -126,7 +202,8 @@ def domain_flux_calc(ash_var1,ash_var2,ash_var3,ash_var4,z_var,time_array,fname)
     final_write_arr = np.column_stack((z_var,total_domain_flux_ash1,total_domain_flux_ash2,total_domain_flux_ash3,total_domain_flux_ash4))
     np.savetxt(fname,final_write_arr,fmt='%.8e',delimiter=',',header='Height (km), 7_8 um ash conc (g/kg), 15_6 um ash conc (g/kg), 125 um ash conc (g/kg), 1 mm ash conc (g/kg)',comments='')
     
-    
+
+# Parse in command line args
 parser=argparse.ArgumentParser()
 parser.add_argument('--input_file','-i',help='Full path to netcdf file')
 parser.add_argument('--output_file','-o',help='Full path to output file')
@@ -135,15 +212,13 @@ args = parser.parse_args()
 fn = args.input_file
 out_name = args.output_file
 
-# fn = '/Users/tylerpaladino/Documents/ISU/Thesis/ATHAM_wind/polar_127_5m_300ms_50ms/atham_netCDF_MOV.nc'
-
 # get netcdf object 
 netcdf_obj = import_netcdf_obj(fn)
 # get x y and z vectors
 x,y,z = import_geometry(netcdf_obj)
 
+# get time array
 time_arr = get_timestep_val(netcdf_obj)
-
 
 # read in entire ash and density tracers
 ash1 = import_tracer(netcdf_obj, 'ash1')
@@ -151,6 +226,5 @@ ash2 = import_tracer(netcdf_obj, 'ash2')
 ash3 = import_tracer(netcdf_obj, 'ash3')
 ash4 = import_tracer(netcdf_obj, 'ash4')
 
-# out_name = 
-
+# calculate domain flux and output to text file
 domain_flux_calc(ash1,ash2,ash3,ash4,z,time_arr,out_name)

@@ -1,33 +1,40 @@
 import netCDF4 as nc
-import pandas as pd
 import numpy as np
-# import matplotlib.pyplot as plt
+import pandas as pd
 
 
 def import_netcdf_obj(filename):
-    '''
-    Imports the netcdf object
+    """Function to import netcdf file
 
-    Input: filename
-    Outputs: netcdf data object
-    '''
+    Parameters
+    ----------
+    filename : str
+        path to netcdf file
+
+    Returns
+    -------
+    netcdf data object
+        netcdf data object
+    """    
     return nc.Dataset(filename)
 
 
 
 def find_closest(arr, arr_num):
-    '''
-    Finds the index in arr closest to the values specified in arr_num
+    """Find closest value in array to specified value
 
     Parameters
-    -----------
-    arr: full array
-    arr_num: single num
+    ----------
+    arr : array
+        array to search through
+    arr_num : float
+        value to search for
 
     Returns
-    -----------
-
-    '''
+    -------
+    int
+        index of closest value in array
+    """    
 
     arr_diff = abs(arr - arr_num)
 
@@ -127,33 +134,26 @@ def write_profiles(profile, prof_name, directory):
             fout.write('\n')
 
 
-# Datafile
 
+keyword = "no_tharsis"
 for atmos in ["cold_dry"]: #,"warm_wet"]:
     if atmos == "cold_dry":
-        dir = '/home/palatyle/LMD_gen/trunk/cold_dry_h2o/'
+        dir = '/home/palatyle/LMD_gen/trunk/cold_dry_no_tharsis/'
     elif atmos == "warm_wet":
         dir = '/home/palatyle/LMD_gen/trunk/warm_wet/'
-    fn = dir+'diagfi.nc'
+    fn = dir+'diagfi_no_tharsis.nc'
 
     # Volcano names filename
-    volc_fn = '/home/palatyle/GCM2MATHAM/Mars_Volc_locs_Arabia.csv'
+    volc_fn = '/home/palatyle/GCM2MATHAM/Mars_Volc_locs.csv'
 
+    # Read in volcano names
     volc_df = pd.read_csv(volc_fn)
 
-
-
-
+    # Set output directory
     out = '/home/palatyle/P_MATHAM/IO_ref/'
 
-    # Lat,lon coords of volcano of interest
-    # lat_volc = 30.0
-    # lon_volc = -30.0
-
-
-    # volc_name = "temp_test_"
-
     print("Reading netcdf file")
+    
     # import netcdf object and remove automasks for all variables
     ds = import_netcdf_obj(fn)
     for k in ds.variables:
@@ -200,6 +200,7 @@ for atmos in ["cold_dry"]: #,"warm_wet"]:
         u_prof_spr = profile_creation(u_spr, lat_volc_idx, lon_volc_idx)
         v_prof_spr = profile_creation(v_spr, lat_volc_idx, lon_volc_idx)
 
+        # Concatonate profiles into one array
         spr_profiles = np.vstack((alt_profile, temp_prof_spr, RH_prof_spr,u_prof_spr,v_prof_spr))
 
         # Summer
@@ -209,6 +210,7 @@ for atmos in ["cold_dry"]: #,"warm_wet"]:
         u_prof_sum = profile_creation(u_sum, lat_volc_idx, lon_volc_idx)
         v_prof_sum = profile_creation(v_sum, lat_volc_idx, lon_volc_idx)
 
+        # Concatonate profiles into one array
         sum_profiles = np.vstack((alt_profile, temp_prof_sum, RH_prof_sum,u_prof_sum,v_prof_sum))
 
 
@@ -219,6 +221,7 @@ for atmos in ["cold_dry"]: #,"warm_wet"]:
         u_prof_fall = profile_creation(u_fall, lat_volc_idx, lon_volc_idx)
         v_prof_fall = profile_creation(v_fall, lat_volc_idx, lon_volc_idx)
 
+        # Concatonate profiles into one array
         fall_profiles = np.vstack((alt_profile, temp_prof_fall, RH_prof_fall,u_prof_fall,v_prof_fall))
 
 
@@ -229,24 +232,11 @@ for atmos in ["cold_dry"]: #,"warm_wet"]:
         u_prof_win = profile_creation(u_win, lat_volc_idx, lon_volc_idx)
         v_prof_win = profile_creation(v_win, lat_volc_idx, lon_volc_idx)
 
+        # Concatonate profiles into one array
         win_profiles = np.vstack((alt_profile[:], temp_prof_win[:], RH_prof_win[:],u_prof_win[:],v_prof_win[:]))
 
         print("write data")
-        write_profiles(spr_profiles, volc_name+'_spring_'+ atmos, out)
-        write_profiles(sum_profiles, volc_name+'_summer_'+ atmos, out)
-        write_profiles(fall_profiles, volc_name+'_fall_'+ atmos, out)
-        write_profiles(win_profiles, volc_name+'_winter_'+ atmos, out)
-
-        # fig, ax = plt.subplots()
-
-        # ax.set_xticks(lon)
-        # ax.set_yticks(lat)
-
-        # for i in range(tsurf.shape[0]):
-        #     plt.imshow(tsurf[i,:,:], extent=[lon.min(), lon.max(), lat.min(), lat.max()])
-        #     plt.plot(lon[50],lat[25],'o')
-        #     plt.colorbar()
-        #     plt.show()
-            
-
-        print('Done')
+        write_profiles(spr_profiles, volc_name+'_spring_'+ atmos + "_" + keyword, out)
+        write_profiles(sum_profiles, volc_name+'_summer_'+ atmos + "_" + keyword, out)
+        write_profiles(fall_profiles, volc_name+'_fall_'+ atmos + "_" + keyword, out)
+        write_profiles(win_profiles, volc_name+'_winter_'+ atmos + "_" + keyword, out)

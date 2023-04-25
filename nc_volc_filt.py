@@ -1,9 +1,12 @@
-from nco import Nco
-import xarray as xr
 import argparse
 
+import xarray as xr
+from nco import Nco
+
+# Initialize nco object
 nco = Nco()
 
+# Parse in arguments
 parser=argparse.ArgumentParser()
 parser.add_argument('--input_file','-i',help='Full path to netcdf file')
 parser.add_argument('--output_file','-o',help='Full path to output file')
@@ -21,6 +24,7 @@ nco.ncks(input=fn,output=out_name,options=["-v \"volc_*\""])
 # Reread in and compress
 ds = xr.open_dataset(out_name,mask_and_scale=False,decode_times=False)
 
+# Write out compressed file
 comp = dict(zlib=True, complevel=1)
 encoding = {var: comp for var in ds.data_vars}
 ds.to_netcdf(out_name+'comp.nc', encoding=encoding)
