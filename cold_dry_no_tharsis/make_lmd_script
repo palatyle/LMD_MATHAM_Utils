@@ -1,0 +1,3 @@
+cd /home/palatyle/LMD_gen/trunk/LMDZ.COMMON/
+./makelmdz_fcm -arch sawtooth -parallel mpi -p std -d 128x96x23 -s 2 -t 7 -b 32x36 -full -io noioipsl -j 8 -fcm_path /home/palatyle/LMD_gen/trunk/LMDZ.COMMON/ioipsl/modipsl/modeles/IOIPSL/tools/FCM_V1.2/bin gcm
+cp bin/gcm_128x96x23_phystd_para.e ../cold_dry_no_tharsis/
