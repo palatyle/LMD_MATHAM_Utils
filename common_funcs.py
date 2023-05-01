@@ -5,7 +5,7 @@ import geopandas
 from itertools import chain, combinations
 import numpy as np
 from scipy.interpolate import griddata 
-from scipy.stats import shapiro, pearsonr, boxcox, normaltest
+from scipy.stats import shapiro, pearsonr, boxcox, normaltest, pointbiserialr
 import statsmodels
 import statsmodels.formula.api as smf
 from statsmodels.tools.tools import maybe_unwrap_results
@@ -351,3 +351,14 @@ def GRS_wrangle(df):
     data_flat = data_grd.flatten()
     
     return lats,lons,data_flat,data_grd
+
+def Cont2Dich(arr,threshold):
+    arr[arr < threshold] = 0
+    arr[arr >= threshold] = 1
+    return arr
+
+def biserial_corr(binary,cont):
+    binary_flat = binary.flatten()
+    binary_flat_nn = binary_flat[~np.isnan(cont)]
+    cont_nn = cont[~np.isnan(cont)]
+    return pointbiserialr(binary_flat_nn,cont_nn)

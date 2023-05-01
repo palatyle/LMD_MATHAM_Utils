@@ -13,10 +13,10 @@ from scipy.stats import shapiro, boxcox, probplot, pearsonr, spearmanr, normalte
 t0 = time.time()
 
 # Change directory to data directory
-os.chdir('data')
+os.chdir('LMD_MATHAM_Utils/data')
 
 # Read in volcano location data
-df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia_no_AC.csv')
+df_volc = pd.read_csv('Mars_Volc_locs_no_Arsia.csv')
 
 # Create powerset of all volcano combinations
 p_set = list(cf.powerset(df_volc['Volcano Name']))
@@ -100,7 +100,7 @@ for volc_name in p_set[-1]:
 all_volc_flat = all_volc_sum.flatten()
 all_volc_flat_nn = all_volc_flat[~np.isnan(GRS_vals_flattened)]
 GRS_vals_flattened_nn = GRS_vals_flattened[~np.isnan(GRS_vals_flattened)]
-GRS_vals_flattened_trans = boxcox(GRS_vals_flattened_nn,0)
+GRS_vals_flattened_trans = boxcox(GRS_vals_flattened,0)
 
 
 # For only best volcs
@@ -111,9 +111,9 @@ for volc_name in best_set:
     best_volc_sum += temp
     
 
-regressor_OLS = sm.OLS(GRS_vals_flattened_trans,volc_1_dict_flat_df.iloc[:]).fit()
-cls = cf.Linear_Reg_Diagnostic(regressor_OLS)
-fig, ax = cls()
+# regressor_OLS = sm.OLS(GRS_vals_flattened_trans,volc_1_dict_flat_df.iloc[:]).fit()
+# cls = cf.Linear_Reg_Diagnostic(regressor_OLS)
+# fig, ax = cls()
 
 vif = pd.DataFrame()
 volc_1_dict_flat_df = sm.add_constant(volc_1_dict_flat_df)
@@ -222,7 +222,7 @@ for tracer in tracer_names:
                 volc_sum_4 += temp
         # With sum finished, calcualte r and shapiro wilkes test for every summed array
         if tracer == 'volc_1_surf':
-            temp_r, temp_sp, temp_nt, temp_lambda = cf.get_r_val(volc_sum_1,GRS_vals_flattened)
+            temp_r, temp_sp, temp_nt, temp_lambda = cf.get_r_val(volc_sum_1,GRS_vals_flattened_trans)
             r_volc_1.append(temp_r)
             sp_volc_1.append(temp_sp)
             nt_volc_1.append(temp_nt)
@@ -245,7 +245,9 @@ for tracer in tracer_names:
             sp_volc_4.append(temp_sp)
             nt_volc_4.append(temp_nt)
             lambda_4.append(temp_lambda)
-    print("tracer: " + tracer +" set: " + str(count) + '/' + str(len(p_set)))
+            
+        if count % 10000 == 0:
+            print("tracer: " + tracer +" set: " + str(count) + '/' + str(len(p_set)))
 
 t1 = time.time()
 
@@ -287,7 +289,7 @@ print(df_volc_1.iloc[list(df_volc_1.r_val.nlargest(15).index)])
 alpha = 0.05
 
 print("Highest R vals with shapiro p val > .05:")
-best_sets_sp = [p_set[i] for i in list(df_volc_1[df_volc_1['sp-p_val']>alpha].r_val.nlargest(500).index)]
+best_sets_sp = [p_set[i] for i in list(df_volc_1[df_volc_1['sp-p_val']>alpha].r_val.nlargest(15).index)]
 
 print(*best_sets_sp,sep='\n')
 print(df_volc_1.iloc[list(df_volc_1[df_volc_1['sp-p_val']>alpha].r_val.nlargest(15).index)])
@@ -311,7 +313,7 @@ print(df_volc_1.iloc[list(df_volc_1[df_volc_1['nt-p_val']>alpha].r_val.nlargest(
 
 
 
-
+print("stop")
 # # df_volc_1.r_val.idxmax()
 # print(best_set) 
 # print('r: '+ str(df_volc_1['r_val'][df_volc_1.r_val.idxmax()]))
