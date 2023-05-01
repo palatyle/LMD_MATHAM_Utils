@@ -68,10 +68,10 @@ for volc_name in volc_df['Volcano Name']:
         file.close()
 
 
-        # Copy over GCM executable 
+        # Copy over GCM executable (will need to be recreated depending on your system)
         shutil.copy2(os.path.join(main_GCM_dir,'gcm_128x96x23_phystd_para.e'),current_dir)
 
-        # Copy over .dat file
+        # Copy over .dat file (will need to be recreated depending on your system)
         shutil.copy2(os.path.join(main_GCM_dir,'Bands_128x96x23_48prc.dat'),current_dir)
         
         # Copy over LMD pbs file
