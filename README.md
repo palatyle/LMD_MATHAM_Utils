@@ -14,7 +14,7 @@
 
 `Sensitivity_tests_viz.py` -- scripts to visualize the output from sensitivity tests.
 
-`batch_start.sh` -- shell script to be placed in the same directory as the generate volcano directories. Will loop through each volcano folder and begin the model runs. 
+`batch_start.sh` -- shell script to be placed in the same directory as the generated volcano directories. Will loop through each volcano folder and begin the model runs. 
 
 `common_funcs.py` -- Common functions used throughout the other scripts
 
