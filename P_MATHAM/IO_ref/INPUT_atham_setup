@@ -1,0 +1,175 @@
+&ATHAM_SETUP
+!----------------------------------------------------------------------!
+! model configuration flags                                            !
+!                                                                      !
+! WARNING! ONLY ONE FLAG CAN BE SET TO TRUE!                           !
+!                                                                      !
+! volcano_setup       simulation of volcanic eruption plume            !
+! coignimbrite_setup                                                   !
+! convection_setup                                                     !
+! fire_setup       ...                                                 !
+! twomoment_setup  ...                                                 !
+!----------------------------------------------------------------------!
+volcano_setup=.true.
+coignimbrite_setup=.false.
+convection_setup=.false.
+procsconfig_setup=.false.	
+
+!----------------------------------------------------------------------!
+! coordinate system and boundary conditions                            !
+!                                                                      !
+! cylindric_geometry   2d cylindric coordinates if true,               !
+!                      cartesian coordinates if false                  !
+! cyclic_boundary      cylic condition at lateral boundaries if true   !
+!                      no slip if false                                ! 
+!----------------------------------------------------------------------!
+cylindric_geometry=.false.
+cyclic_boundary=.false.
+read_zgrid=.false.
+
+!----------------------------------------------------------------------!
+! initialization for water vapor                                       !
+! rh_init_water  treat initial relative humidity in INPUT_profile      !
+!                always as RH over water if true                       !
+!                as RH over water or ice if false                      !
+!----------------------------------------------------------------------!
+rh_init_water=.false.
+
+!----------------------------------------------------------------------!
+! output format                                                        !
+!                                                                      !
+! netcdf               netcdf format if true,                          !
+!                      single precision binary if false                !
+! grid2geo             linear approximation of xyz grid in geographical!
+!                      (lon/lat/lev) frame                             !
+! sim_d_*              simulation onset date YYYY-MM-DD   (grid2geo)   !
+! sim_t_*              simulation onset time hh:mm:ss     (grid2geo)   !
+!                      time (for now) should correspond to the time for!
+!                        which profile data is available, expressed as !
+!			 local mean time                               !
+! timezone             time zone of grid center with respect to GMT,   !
+!                        positive eastward, fraction possible          !
+!----------------------------------------------------------------------!
+netcdf=.true.
+grid2geo=.false.
+sim_d_YYYY = 2014
+sim_d_MM   = 07 
+sim_d_DD   = 25
+sim_t_hh   = 00
+sim_t_mm   = 00
+sim_t_ss   = 00
+timezone   = 0.
+
+!----------------------------------------------------------------------!
+! model geometry:                                                      !
+!                                                                      !
+! nx,ny,nz     number of grid points in each direction,                !
+!              ny=4 in 2d versions                                     !
+!                                                                      !
+! npx,npy      number of processors in x/y direction (MPI version)     !
+!              fraction of nx/ny is assigned to each processor         !
+!                                                                      !
+! xstart       [m]   start of x-domain                                 !
+! xtotal       [m]   total x-domain                                    !
+! dxzoom       [m]   spatial resolution in center of zoom in x         !
+! icenter      [1]   location of zoom in x in grid space               !
+! nxtrans      [1]   width of zoom in x in grid space                  !
+! nxtrans_boundary [1]   size of transition zone at lateral boundary   !
+!                                                                      !
+! ystart       [m]   start of y-domain                                 !
+! ytotal       [m]   total y-domain                                    !
+! dyzoom       [m]   spatial resolution in center of zoom in y         !
+! jcenter      [1]   location of zoom in y in grid space               !
+! nytrans      [1]   width of zoom in y in grid space                  !
+! nytrans_boundary [1]   size of transition zone at lateral boundary   !
+!                                                                      !
+! zstart       [m]   start of z-domain                                 !
+! ztotal       [m]   total x-domain                                    !
+! dzzoom       [m]   spatial resolution in center of zoom in z         !
+! kcenter      [1]   location of zoom in z in grid space               !
+! nztrans      [1]   width of zoom in z in grid space                  !
+! nztrans_boundary [1]   size of transition zone at top boundary       !
+!                                                                      !
+! myrank       [1]   rank / processor number                           !
+!----------------------------------------------------------------------!
+nx      =146
+npx     =8
+xstart  =0.
+xtotal  =100000.	!15000.
+dxzoom  =30.
+icenter =73
+nxtrans =15
+nxtrans_boundary =15
+
+!2d version
+!ny      =4
+!npy     =1
+!ystart  =0.
+!ytotal  =3000.
+!dyzoom  =1000.
+!jcenter =3
+!nytrans =1
+!nytrans_boundary=1
+
+ny      =146
+npy     =8
+ystart  =0.
+ytotal  =100000.	!15000.
+dyzoom  =30.
+jcenter =73
+nytrans =15
+nytrans_boundary =15
+
+nz      =173
+zstart  =0.
+ztotal  =50000.		!30000.
+dzzoom  =30.	!30.
+kcenter =10
+nztrans =6
+nztrans_boundary =6
+
+!----------------------------------------------------------------------!
+! run time control variables:                                          !
+!                                                                      !
+! nrep                    number of periods for i/o. Number of internal!
+!                           logs generated by the model                !
+! periodt      [sec]      length of period between i/o. The model will !
+!                           run until elapsed model time is greater    !
+!                           than periodt                               !
+! dt           [sec]      intial time step                             !
+! dtmin        [sec]      smallest allowed time step                   !
+! dtmax        [sec]      largest allowed time step                    !
+! cfllim       [1]        CFL limit for advection                      !
+! timetot      [sec]      model time counter                           !
+! cpumax       [sec]      maximal allowed cpu-time per run             !
+!----------------------------------------------------------------------!
+nrep    =60
+periodt =60.
+dt      =20.0
+dtmin   =0.1	!0.05	!0.01
+dtmax   =20.0
+cfllim  =0.8
+cpumax  =9.e6
+
+!----------------------------------------------------------------------!
+! longi/latitudinal location of the grid [degree]                      !
+!----------------------------------------------------------------------!
+! Etna:
+! deglon =14.9971
+! deglat =37.7321
+!------------------
+! Pinatubo:
+!deglon =120.3
+!deglat = 15.1
+!------------------
+! Redoubt:
+!deglon =-152.7613
+!deglat =60.4886
+!------------------
+!Eyjafjallajokull:
+deglon =-19.631111
+deglat =63.624722
+
+no_uwind=.false.	!.true.
+no_vwind=.false.
+/

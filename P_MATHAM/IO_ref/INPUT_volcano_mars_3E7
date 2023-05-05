@@ -1,0 +1,248 @@
+&VOLCANO_SETUP
+!----------------------------------------------------------------------!
+! control flags for active process modules                             !
+!----------------------------------------------------------------------!
+kessler_micro=.true.
+kessler_diag=.false.
+
+diag_entrainment=.false.
+diag_latent_heat=.true.
+diag_radar_reflectivity=.false.
+
+topo_from_file=.false.
+!----------------------------------------------------------------------!
+! number tracers (max=99)                                              !
+! ntgas       gaseous tracer                                           !
+! ntrac       incompressible tracer (liquid or solid)                  !
+! ntnum       tracer for number concentrations                         !
+!----------------------------------------------------------------------!
+ntgas=2
+ntrac=10
+ntpas=0
+
+!----------------------------------------------------------------------!
+! specific heat capacities for gaseous tracer                          !
+! cptgas  [J/kg/K]                                                     !
+! cvtgas  [J/kg/K]                                                     !
+!----------------------------------------------------------------------!
+cptgas(1)=1870.
+cvtgas(1)=1410.
+
+cptgas(2)=1870.
+cvtgas(2)=1410.
+
+!----------------------------------------------------------------------!
+! specific heat capacities for incompressible tracer                   !
+! cptrac  [J/kg/K]                                                     !
+!----------------------------------------------------------------------!
+cptrac(1)=4183.
+cptrac(2)=4183.
+cptrac(3)=2103.
+cptrac(4)=2103.
+cptrac(5)=1500.
+cptrac(6)=1500.
+cptrac(7)=1200.
+cptrac(8)=1200.
+cptrac(9)=1200.
+cptrac(10)=1200.
+!----------------------------------------------------------------------!
+! particle densities for incompressible tracer                         !
+! rhotrac  [kg/m3]                                                     !
+!----------------------------------------------------------------------!
+rhotrac(1)=1000.
+rhotrac(2)=1000.
+rhotrac(3)= 917.
+rhotrac(4)= 700.
+rhotrac(5)= 1560.
+rhotrac(6)= 1560.
+rhotrac(7)=1500.
+rhotrac(8)=1500.
+rhotrac(9)=1500.
+rhotrac(10)=1500.
+!----------------------------------------------------------------------!
+! particle size for incompressible tracer                              !
+! radtrac  [m]                                                         !
+!----------------------------------------------------------------------!
+radtrac(1)=0.000010
+radtrac(2)=0.000010
+radtrac(3)=0.000010
+radtrac(4)=0.000010
+radtrac(5)=0.000010
+radtrac(6)=0.000010
+radtrac(7)=0.0000078125
+radtrac(8)=0.000015625
+radtrac(9)=0.000125
+radtrac(10)=.001
+!----------------------------------------------------------------------!
+! specify tracers written to movie and picture file                    !
+!                                                                      !
+! total number of tracer written to movie/picture file:                !
+! (default: ntracer_movie/picture=ntracer)                             !
+!                                                                      !
+! ntgas_movie/picture          gaseous tracer                          !
+! ntrac_movie/picture          incompressible tracer                   !
+! ntnum_movie/picture          number concentration                    !
+!                                                                      !
+! list of tracer written to movie/picture file:                        !
+! (default: itracer_movie/picture(itracer)=itracer                     !
+!                                                                      !
+! itgas_movie/picture(itgas)   gaseous tracer                          !
+! itrac_movie/picture(itrac)   incompressible tracer                   !
+! itpas_movie/picture(itnum)   number concentration                    !
+!                                                                      !
+! var_tgas/trac/tpas_movie/picture   variable names for descriptor file!
+! des_tgas/trac/tpas_movie/picture   variable description              !
+!----------------------------------------------------------------------!
+ntgas_picture=2
+itgas_picture(1)=1
+var_tgas_picture(1)='wetnew'
+des_tgas_picture(1)='water_vapor'
+itgas_picture(2)=2
+var_tgas_picture(2)='co2new'
+des_tgas_picture(2)='co2'
+
+ntrac_picture=10
+itrac_picture(1)=1
+var_trac_picture(1)='watcnew'
+des_trac_picture(1)='cloud_water'
+itrac_picture(2)=2
+var_trac_picture(2)='watpnew'
+des_trac_picture(2)='rain'
+itrac_picture(3)=3
+var_trac_picture(3)='icecnew'
+des_trac_picture(3)='cloud_ice'
+itrac_picture(4)=4
+var_trac_picture(4)='granew'
+des_trac_picture(4)='graupel'
+itrac_picture(5)=5
+var_trac_picture(5)='co2icenew'
+des_trac_picture(5)='dryice (small)'
+itrac_picture(6)=6
+var_trac_picture(6)='co2granew'
+des_trac_picture(6)='co2graupel'
+itrac_picture(7)=7
+var_trac_picture(7)='ash1'
+des_trac_picture(7)='7_8um_ash'
+itrac_picture(8)=8
+var_trac_picture(8)='ash2'
+des_trac_picture(8)='15_6um_ash'
+itrac_picture(9)=9
+var_trac_picture(9)='ash3'
+des_trac_picture(9)='125_um_ash'
+itrac_picture(10)=10
+var_trac_picture(10)='ash4'
+des_trac_picture(10)='1_mm_ash'
+
+ntgas_movie=2
+itgas_movie(1)=1
+var_tgas_movie(1)='wetnew'
+des_tgas_movie(1)='water_vapor'
+itgas_movie(2)=2
+var_tgas_movie(2)='co2new'
+des_tgas_movie(2)='co2'
+
+ntrac_movie=10
+itrac_movie(1)=1
+var_trac_movie(1)='watcnew'
+des_trac_movie(1)='cloud_water'
+itrac_movie(2)=2
+var_trac_movie(2)='watpnew'
+des_trac_movie(2)='rain'
+itrac_movie(3)=3
+var_trac_movie(3)='icecnew'
+des_trac_movie(3)='cloud_ice'
+itrac_movie(4)=4
+var_trac_movie(4)='granew'
+des_trac_movie(4)='graupel'
+itrac_movie(5)=5
+var_trac_movie(5)='co2icenew'
+des_trac_movie(5)='dryice (small)'
+itrac_movie(6)=6
+var_trac_movie(6)='co2granew'
+des_trac_movie(6)='co2graupel'
+itrac_movie(7)=7
+var_trac_movie(7)='ash1'
+des_trac_movie(7)='7_8um_ash'
+itrac_movie(8)=8
+var_trac_movie(8)='ash2'
+des_trac_movie(8)='15_6um_ash'
+itrac_movie(9)=9
+var_trac_movie(9)='ash3'
+des_trac_movie(9)='125_um_ash'
+itrac_movie(10)=10
+var_trac_movie(10)='ash4'
+des_trac_movie(10)='1_mm_ash'
+
+ntpas_movie=0
+
+!----------------------------------------------------------------------!
+! duration of eruption                                                 !
+!                                                                      !
+! spinup         s      time for spinup                                !
+! ramp           s      time for start of eruption                     !
+! eruption       s      time for the whole eruption                    !
+! damping        s      time for end of eruption                       !
+! dtmax_erup     s      maximum time step during eruption              !
+!----------------------------------------------------------------------!
+spinup=0.
+ramp=2.
+eruption=3600.  !10.?
+damping=20.     !4. , 100.
+dtmax_erup=1.
+
+!----------------------------------------------------------------------!
+! volcano shape:                                                       !
+!                                                                      !
+! volcano_height      [m]   total height                               !
+! volcano_hwidth      [m]   total width                                !
+! volcano_valley      [m]   depth of crater valley                     !
+! volcano_vwidth      [m]   width of crater valley                     !
+!----------------------------------------------------------------------!
+volcano_height=1500.
+volcano_hwidth=4000.
+volcano_valley=160.
+volcano_vwidth=160.
+
+!----------------------------------------------------------------------!
+! volcanic forcing                                                     !
+!                                                                      !
+! volvel         m/s    exit velocity                                  !
+! volvel_sine    s      sinus modulation on top of volvel              !
+! volvel_ampl    m/s    amplitude of sinus modulation of volvel        !
+! voltem         k      potential temperature at vent                  !
+! voltgas(ntgas) kg/kg  specific gas concentration at vent             !
+! voltrac(ntrac) kg/kg  specific particle concentration at vent        !
+! voltpas        #/kg   concentration of passive tracer at vent        !
+! volhor         m^2/s  horizontal turbulent energy at the vent        !
+! volver         m^2/s  vertical turbulent energy at the vent          !
+! vollen         m      turbulent length scale at the vent             !
+! dxvol          m      horizontal profile (1-dx^2/dxvol^2)            !
+! dyvol          m      horizontal profile (1-dy^2/dyvol^2)            !
+! nxforce        1      number of forced grid points icenter+-nxforce  !
+!----------------------------------------------------------------------!
+volvel=200
+volvel_sine=0.
+volvel_ampl=0.
+voltem=1450.
+volhor=500.
+volver=300.
+vollen=30.
+dxvol=1000000.
+dyvol=1000000.
+nxforce=4
+nyforce=4
+
+voltgas(1)=0.04
+voltgas(2)=0.00
+voltrac(1)=0.
+voltrac(2)=0.
+voltrac(3)=0.
+voltrac(4)=0.
+voltrac(5)=0.
+voltrac(6)=0.
+voltrac(7)=0.264
+voltrac(8)=0.370
+voltrac(9)=0.274
+voltrac(10)=0.051
+
+/

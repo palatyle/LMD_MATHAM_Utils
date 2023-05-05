@@ -1,0 +1,217 @@
+&VOLCANO_SETUP
+!----------------------------------------------------------------------!
+! control flags for active process modules                             !
+!----------------------------------------------------------------------!
+kessler_micro=.true.
+kessler_diag=.false.
+
+diag_entrainment=.false.
+diag_latent_heat=.true.
+diag_radar_reflectivity=.false.
+
+topo_from_file=.false.
+!----------------------------------------------------------------------!
+! number tracers (max=99)                                              !
+! ntgas       gaseous tracer                                           !
+! ntrac       incompressible tracer (liquid or solid)                  !
+! ntnum       tracer for number concentrations                         !
+!----------------------------------------------------------------------!
+ntgas=2
+ntrac=8
+ntpas=0
+
+!----------------------------------------------------------------------!
+! specific heat capacities for gaseous tracer                          !
+! cptgas  [J/kg/K]                                                     !
+! cvtgas  [J/kg/K]                                                     !
+!----------------------------------------------------------------------!
+cptgas(1)=1870.
+cvtgas(1)=1410.
+
+cptgas(2)=1870.
+cvtgas(2)=1410.
+
+!----------------------------------------------------------------------!
+! specific heat capacities for incompressible tracer                   !
+! cptrac  [J/kg/K]                                                     !
+!----------------------------------------------------------------------!
+cptrac(1)=4183.
+cptrac(2)=4183.
+cptrac(3)=2103.
+cptrac(4)=2103.
+cptrac(5)=1200.
+cptrac(6)=1200.
+cptrac(7)=1200.
+cptrac(8)=1200.
+!----------------------------------------------------------------------!
+! particle densities for incompressible tracer                         !
+! rhotrac  [kg/m3]                                                     !
+!----------------------------------------------------------------------!
+rhotrac(1)=1000.
+rhotrac(2)=1000.
+rhotrac(3)= 917.
+rhotrac(4)= 700.
+rhotrac(5)=2500.
+rhotrac(6)=2500.
+rhotrac(7)=2500.
+rhotrac(8)=2500.
+!----------------------------------------------------------------------!
+! particle size for incompressible tracer                              !
+! radtrac  [m]                                                         !
+!----------------------------------------------------------------------!
+radtrac(1)=0.000010
+radtrac(2)=0.000010
+radtrac(3)=0.000010
+radtrac(4)=0.000010
+radtrac(5)=0.0000009766
+radtrac(6)=0.0000039063
+radtrac(7)=0.00003125
+radtrac(8)=0.000250
+
+!----------------------------------------------------------------------!
+! specify tracers written to movie and picture file                    !
+!                                                                      !
+! total number of tracer written to movie/picture file:                !
+! (default: ntracer_movie/picture=ntracer)                             !
+!                                                                      !
+! ntgas_movie/picture          gaseous tracer                          !
+! ntrac_movie/picture          incompressible tracer                   !
+! ntnum_movie/picture          number concentration                    !
+!                                                                      !
+! list of tracer written to movie/picture file:                        !
+! (default: itracer_movie/picture(itracer)=itracer                     !
+!                                                                      !
+! itgas_movie/picture(itgas)   gaseous tracer                          !
+! itrac_movie/picture(itrac)   incompressible tracer                   !
+! itpas_movie/picture(itnum)   number concentration                    !
+!                                                                      !
+! var_tgas/trac/tpas_movie/picture   variable names for descriptor file!
+! des_tgas/trac/tpas_movie/picture   variable description              !
+!----------------------------------------------------------------------!
+ntgas_picture=2
+itgas_picture(1)=1
+var_tgas_picture(1)='wetnew'
+des_tgas_picture(1)='water_vapor'
+itgas_picture(2)=2
+var_tgas_picture(2)='so2new'
+des_tgas_picture(2)='sulfur_dioxide'
+
+ntrac_picture=8
+itrac_picture(1)=1
+var_trac_picture(1)='watcnew'
+des_trac_picture(1)='cloud_water'
+itrac_picture(2)=2
+var_trac_picture(2)='watpnew'
+des_trac_picture(2)='rain'
+itrac_picture(3)=3
+var_trac_picture(3)='icecnew'
+des_trac_picture(3)='cloud_ice'
+itrac_picture(4)=4
+var_trac_picture(4)='granew'
+des_trac_picture(4)='graupel'
+itrac_picture(5)=5
+var_trac_picture(5)='ash1'
+des_trac_picture(5)='9phi_ash'
+itrac_picture(6)=6
+var_trac_picture(6)='ash2'
+des_trac_picture(6)='7phi_ash'
+itrac_picture(7)=7
+var_trac_picture(7)='ash3'
+des_trac_picture(7)='4phi_ash'
+itrac_picture(8)=8
+var_trac_picture(8)='ash4'
+des_trac_picture(8)='1phi_ash'
+
+ntgas_movie=2
+itgas_movie(1)=1
+var_tgas_movie(1)='wetnew'
+des_tgas_movie(1)='water_vapor'
+itgas_movie(2)=2
+var_tgas_movie(2)='so2new'
+des_tgas_movie(2)='sulfur_dioxide'
+
+ntrac_movie=4
+itrac_movie(1)=5
+var_trac_movie(1)='ash1'
+des_trac_movie(1)='9phi_ash'
+itrac_movie(2)=6
+var_trac_movie(2)='ash2'
+des_trac_movie(2)='7phi_ash'
+itrac_movie(3)=7
+var_trac_movie(3)='ash3'
+des_trac_movie(3)='4phi_ash'
+itrac_movie(4)=8
+var_trac_movie(4)='ash4'
+des_trac_movie(4)='1phi_ash'
+
+ntpas_movie=0
+
+!----------------------------------------------------------------------!
+! duration of eruption                                                 !
+!                                                                      !
+! spinup         s      time for spinup                                !
+! ramp           s      time for start of eruption                     !
+! eruption       s      time for the whole eruption                    !
+! damping        s      time for end of eruption                       !
+! dtmax_erup     s      maximum time step during eruption              !
+!----------------------------------------------------------------------!
+spinup=0.
+ramp=4.
+eruption=3600.  !10.?
+damping=20.     !4. , 100.
+dtmax_erup=1.
+
+!----------------------------------------------------------------------!
+! volcano shape:                                                       !
+!                                                                      !
+! volcano_height      [m]   total height                               !
+! volcano_hwidth      [m]   total width                                !
+! volcano_valley      [m]   depth of crater valley                     !
+! volcano_vwidth      [m]   width of crater valley                     !
+!----------------------------------------------------------------------!
+volcano_height=1600.
+volcano_hwidth=4000.
+volcano_valley=100.
+volcano_vwidth=180.
+
+!----------------------------------------------------------------------!
+! volcanic forcing                                                     !
+!                                                                      !
+! volvel         m/s    exit velocity                                  !
+! volvel_sine    s      sinus modulation on top of volvel              !
+! volvel_ampl    m/s    amplitude of sinus modulation of volvel        !
+! voltem         k      potential temperature at vent                  !
+! voltgas(ntgas) kg/kg  specific gas concentration at vent             !
+! voltrac(ntrac) kg/kg  specific particle concentration at vent        !
+! voltpas        #/kg   concentration of passive tracer at vent        !
+! volhor         m^2/s  horizontal turbulent energy at the vent        !
+! volver         m^2/s  vertical turbulent energy at the vent          !
+! vollen         m      turbulent length scale at the vent             !
+! dxvol          m      horizontal profile (1-dx^2/dxvol^2)            !
+! dyvol          m      horizontal profile (1-dy^2/dyvol^2)            !
+! nxforce        1      number of forced grid points icenter+-nxforce  !
+!----------------------------------------------------------------------!
+volvel=50
+volvel_sine=0.
+volvel_ampl=0.
+voltem=1000.
+volhor=500.
+volver=300.
+vollen=30.
+dxvol=1000000.
+dyvol=1000000.
+nxforce=2
+nyforce=2
+
+voltgas(1)=0.04
+voltgas(2)=0.01
+voltrac(1)=0.
+voltrac(2)=0.
+voltrac(3)=0.
+voltrac(4)=0.
+voltrac(5)=0.0648
+voltrac(6)=0.191
+voltrac(7)=0.542
+voltrac(8)=0.152
+
+/

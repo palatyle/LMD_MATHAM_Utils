@@ -1,0 +1,3 @@
+cd /home/palatyle/LMD_gen/trunk/LMDZ.COMMON/
+./makelmdz_fcm -arch sawtooth -p std -d 128x96x23 -t 7 -b 32x36 -io noioipsl -fcm_path /home/palatyle/LMD_gen/trunk/LMDZ.COMMON/ioipsl/modipsl/modeles/IOIPSL/tools/FCM_V1.2/bin newstart
+cp bin/newstart_128x96x23_phystd_seq.e ../cold_dry/

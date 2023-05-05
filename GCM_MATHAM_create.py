@@ -4,7 +4,7 @@ import shutil
 
 import pandas as pd
 
-# Define directories
+# -Define directories
 main_GCM_dir = '/home/palatyle/LMD_gen/trunk/cold_dry_no_tharsis/'
 MATHAM_dir = '/home/palatyle/P_MATHAM/'
 code_dir = os.getcwd() # '/home/palatyle/LMD_MATHAM_Utils/'
@@ -68,10 +68,10 @@ for volc_name in volc_df['Volcano Name']:
         file.close()
 
 
-        # Copy over GCM executable 
+        # Copy over GCM executable (will need to be recreated depending on your system)
         shutil.copy2(os.path.join(main_GCM_dir,'gcm_128x96x23_phystd_para.e'),current_dir)
 
-        # Copy over .dat file
+        # Copy over .dat file (will need to be recreated depending on your system)
         shutil.copy2(os.path.join(main_GCM_dir,'Bands_128x96x23_48prc.dat'),current_dir)
         
         # Copy over LMD pbs file
@@ -95,7 +95,7 @@ for volc_name in volc_df['Volcano Name']:
 
         # Copy MATHAM pbs file from MATHAM directory for each season
         for season in ["winter","spring","summer","fall"]:
-            shutil.copy2(os.path.join(MATHAM_dir,'Mars_test_warm_wet.pbs'),current_dir+"/MATHAM_"+ volc_name + "_" + atmos + "_" + season + ".pbs")
+            shutil.copy2(os.path.join(MATHAM_dir,'MATHAM_pbs.pbs'),current_dir+"/MATHAM_"+ volc_name + "_" + atmos + "_" + season + ".pbs")
             file = open("MATHAM_"+ volc_name + "_" + atmos + "_" + season + ".pbs","r")
             MATHAM_pbs = file.readlines()
             

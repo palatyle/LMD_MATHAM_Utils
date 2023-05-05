@@ -141,7 +141,7 @@ for atmos in ["cold_dry"]: #,"warm_wet"]:
         dir = '/home/palatyle/LMD_gen/trunk/cold_dry_no_tharsis/'
     elif atmos == "warm_wet":
         dir = '/home/palatyle/LMD_gen/trunk/warm_wet/'
-    fn = dir+'diagfi_no_tharsis.nc'
+    fn = dir+'diagfi_no_tharsis.nc' # This will need to be replaced with the output from the base GCM simulation.
 
     # Volcano names filename
     volc_fn = '/home/palatyle/GCM2MATHAM/Mars_Volc_locs.csv'

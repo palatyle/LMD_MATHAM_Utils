@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -j oe
+#PBS -k doe
+
+#PBS -N LMDZ_GCM_cold_icy
+#PBS -m abe
+#PBS -M palatyle@isu.edu
+#PBS -l select=2:ncpus=24:mpiprocs=24
+#PBS -l walltime=24:00:00
+
+#PBS -P edu_res
+
+cd $PBS_O_WORKDIR
+source /etc/profile.d/modules.sh
+
+module load netcdf/c-4.7.4_gcc9.3.0
+module load netcdf/f-4.7.4_gcc9.3.0
+module load pnetcdf/1.12.2
+
+mpirun /home/palatyle/LMD_gen/trunk/cold_dry_no_tharsis/gcm_128x96x23_phystd_para.e
+

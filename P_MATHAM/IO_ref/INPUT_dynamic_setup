@@ -1,0 +1,109 @@
+&DYNAMIC_SETUP
+!----------------------------------------------------------------------!
+! settings for dynamical core                                          !
+!                                                                      !
+! changes should only be made by experienced users                     !
+!----------------------------------------------------------------------!
+
+!----------------------------------------------------------------------!
+! alpha    backward fraction of Cranck Nicholson scheme                !
+! over     overrelaxation coefficient                                  !
+!----------------------------------------------------------------------!
+alpha=0.75
+over=1.25
+!----------------------------------------------------------------------!
+! min/max number of iterations                                         !
+!----------------------------------------------------------------------!
+nitmin=6
+nitmax=10
+
+!----------------------------------------------------------------------!
+! accuracy parameter                                                   !
+!     acprs     required accuracy for pressure                         !
+!     acimp     required accuracy for momentum                         !
+!     actem     required accuracy for temperature                      !
+!     actgas    required accuracy for gases                            !
+!     actrac    required accuracy for particle tracer                  !
+!     actpas    required accuracy for passive tracer                   !
+!     achor     required accuracy for hor. turb. energy                !
+!     acver     required accuracy for ver. turb. energy                !
+!     aclen     required accuracy for turb. length scale               !
+!     acden     required relative accuracy for density                 !
+!----------------------------------------------------------------------!
+acprs=10.
+acimp=0.1
+actem=1000.
+actgas=0.001
+actrac=0.01
+actpas=1.e12
+achor=15.
+acver=15.
+aclen=5.
+acden=1.e-6
+
+!----------------------------------------------------------------------!
+! sponge layer at the model top                                        !
+! increasing diffusion of momentum                                     !
+!----------------------------------------------------------------------!
+sponge_in_vertical=.false.
+spmax=500.
+spstep=50.
+spfrac=0.1
+
+!----------------------------------------------------------------------!
+! additional diffusion on stretched grid                               !
+! taudiff_mom      time scale for diffusion of momentum        [s]     !
+! taudiff_turb     time scale for diffusion of turbulence      [s]     !
+! tau_divdamp_high time scale for divergence damping           [s]     !
+!                  exponential profile strongest at model top          !
+! tau_divdamp_low  time scale for divergence damping           [s]     !
+!                  constant strength vertically                        !
+! w_stretched      additional diffusion for grid stretching    [1]     !
+! damp_tetano      near ground damping of temperature          logical !
+!                                                                      !
+! advtet_high      diffusion term in advection scheme,         logical !
+! advtrac_high     higher (only flow dependent) if true        logical !
+! advmom_high                                                  logical !
+!                                                                      !
+! diff_rhotrac    diffuse rho*rac instead of trac              logical !
+! conserve_mom    conserve momentum under diffusion            logical !
+!----------------------------------------------------------------------!
+taudiff_mom=0.
+taudiff_turb=0.
+tau_divdamp_high=0.
+tau_divdamp_low=0.
+w_stretched=0.
+damp_tetano=.false.
+
+advtet_high=.false.
+advtrac_high=.false.
+advmom_high=.false.
+
+diff_rhotrac=.true.
+!conserve_mom=.true.	!.false.
+!----------------------------------------------------------------------!
+! constant for turbulence scheme                                       !
+! c0          proportionality factor for diffusion coeff for momentum  !
+! alpha_tet   additional proportionality factor for diffusion of heat  !
+!             1+alpha_tet*turblen/delta_x                              !
+! arith_mean  if true use local arithmetic mean grid spacing           !
+!             to limit turbulent length scale,                         !
+!             geometric mean otherwise                                 !
+!----------------------------------------------------------------------!
+c0=0.32
+alpha_tet=0.5
+arith_mean=.false.
+
+!----------------------------------------------------------------------!
+! flags:                                                               !
+! gas_diffusion   add diffusion of gasnew to pressure equation         !
+! use_pot_temp    use potential gas temperature instead of             !
+!                 in situ temperature in pressure equation             !
+! new_update      new routine for equation of state                    !
+!                 used during time stepping (less diffusive)           !
+!----------------------------------------------------------------------!
+gas_diffusion=.true.
+!use_pot_temp=.false.
+!new_update=.true.
+
+/
