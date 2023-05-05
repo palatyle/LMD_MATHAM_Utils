@@ -6,6 +6,10 @@
 
 `GCM_MATHAM_create.py` -- Script to generate individual directories containing everything needed to run both the Generic PCM and the martian adaptation to ATHAM (P_MATHAM). You will need to edit the first couple lines of code indicating where the PCM, PCM data, and MATHAM directories are. 
 
+`GWR_output_summary.xlsx` -- Excel file containing major output from GWR analysis done in Arc as well as some plots.
+
+`GWER_project.ppkx` -- ArcGIS Pro Project Package containing raw and transformed GCM output as well as all GWR analyses. 
+
 `LMD_interp.py` -- Script to interpolate model output from the PCM to the resolution and extent of the GRS H<sub>2</sub>O data. This script will loop through all output from the coupled PCM-MATHAM mopdels and output geopackages. 
 
 `MATHAM_domain_flux.py` -- Script to sum up ash in MATHAM. Outputs a text file with each column indicating a different ash tracer as well as height above the ground. This script is callable from the command line.
