@@ -4,15 +4,18 @@ import shutil
 
 import pandas as pd
 
-# -Define directories
-main_GCM_dir = '/home/palatyle/LMD_gen/trunk/cold_dry_no_tharsis/'
-GCM_datadir = '/home/palatyle/LMD_gen/trunk/datadir'
-MATHAM_dir = '/home/palatyle/P_MATHAM/'
+# Define directories
+main_GCM_dir = '/home/palatyle/LMD_gen/trunk/cold_dry_no_tharsis/' # GCM/PCM Directory
+GCM_datadir = '/home/palatyle/LMD_gen/trunk/datadir' # GCM/PCM data directory
+MATHAM_dir = '/home/palatyle/P_MATHAM/' # MATHAM directory 
 code_dir = os.getcwd() # '/home/palatyle/LMD_MATHAM_Utils/'
-
+pbs_dir = '/home/palatyle/LMD_MATHAM_Utils/pbs_dir/'
 
 # Volcano names filename
-volc_fn = '/home/palatyle/GCM2MATHAM/Mars_Volc_locs.csv'
+volc_fn = '/home/palatyle/LMD_MATHAM_Utils/data/Mars_Volc_locs.csv'
+
+# Directory in which all volcano output directories will be created. 
+out_dir = '/scratch/palatyle/'
 
 # Keyword definition 
 keyword = "no_tharsis"
@@ -35,8 +38,8 @@ for volc_name in volc_df['Volcano Name']:
     # Loop through atmospheres
     for atmos in ["cold_dry"]:#,"warm_wet"]:
         
-        # Make directory in scratch in the foramt of keyword_VolcanoName_AtmosphereType
-        os.mkdir("/scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos)
+        # Make directory in scratch in the format of keyword_VolcanoName_AtmosphereType
+        os.mkdir(out_dir + keyword + '_' + volc_name + "_" + atmos)
         os.mkdir(atmos)
         os.chdir(atmos)
         current_dir = os.getcwd()
@@ -49,7 +52,7 @@ for volc_name in volc_df['Volcano Name']:
         file = open('callphys.def','r')
         callphys_def = file.readlines()
         # Edit output dir line
-        callphys_def[21] = "output_dir = /scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos + "/" + "diagfi.nc\n"
+        callphys_def[21] = "output_dir = " + out_dir + keyword + '_' + volc_name + "_" + atmos + "/" + "diagfi.nc\n"
         callphys_def[24] = "callvolcano=.true."
         # Edit volcano name line
         callphys_def[46] = "volc_name=" + volc_name + "\n"
@@ -76,7 +79,7 @@ for volc_name in volc_df['Volcano Name']:
         shutil.copy2(os.path.join(main_GCM_dir,'Bands_128x96x23_48prc.dat'),current_dir)
         
         # Copy over LMD pbs file
-        shutil.copy2(os.path.join(main_GCM_dir,'pbs_LMD.pbs'),current_dir)
+        shutil.copy2(os.path.join(pbs_dir,'pbs_LMD.pbs'),current_dir)
         
         # Edit LMD pbs file
         file = open('pbs_LMD.pbs','r')
@@ -96,18 +99,18 @@ for volc_name in volc_df['Volcano Name']:
 
         # Copy MATHAM pbs file from MATHAM directory for each season
         for season in ["winter","spring","summer","fall"]:
-            shutil.copy2(os.path.join(MATHAM_dir,'MATHAM_pbs.pbs'),current_dir+"/MATHAM_"+ volc_name + "_" + atmos + "_" + season + ".pbs")
+            shutil.copy2(os.path.join(pbs_dir,'MATHAM_pbs.pbs'),current_dir+"/MATHAM_"+ volc_name + "_" + atmos + "_" + season + ".pbs")
             file = open("MATHAM_"+ volc_name + "_" + atmos + "_" + season + ".pbs","r")
             MATHAM_pbs = file.readlines()
             
             MATHAM_pbs[7] = "#PBS -N MATHAM_" + volc_name + "_" + atmos + "_" + season + "_" + keyword + "\n"
 
             # MATHAM executable file path
-            MATHAM_exec = "/home/palatyle/P_MATHAM/exec/atham"
+            MATHAM_exec = os.path.join(MATHAM_dir,'exec/atham') 
             
             # Set input flags
-            i_flag = " -i /home/palatyle/P_MATHAM/IO_ref"
-            o_flag = " -o /scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos
+            i_flag = " -i "+ MATHAM_dir + "IO_ref"
+            o_flag = " -o "+ out_dir + keyword + '_' + volc_name + "_" + atmos
             f_flag = " -f MATHAM_" + season
             a_flag = " -a INPUT_atham_setup_Mars"
             p_flag = " -p " + volc_name + "_" + season + "_" + atmos + "_" + keyword
@@ -120,12 +123,12 @@ for volc_name in volc_df['Volcano Name']:
             file.close()
 
             # Domain flux pbs edit
-            shutil.copy2(os.path.join(code_dir,'domain_flux.pbs'),current_dir+"/domain_flux_"+ volc_name + "_" + atmos + "_" + season + ".pbs")
+            shutil.copy2(os.path.join(pbs_dir,'domain_flux.pbs'),current_dir+"/domain_flux_"+ volc_name + "_" + atmos + "_" + season + ".pbs")
             file = open("domain_flux_"+ volc_name + "_" + atmos + "_" + season + ".pbs","r")
             domain_flux_pbs = file.readlines()
 
             domain_flux_pbs[4] = "#PBS -N domain_flux_" + volc_name + "_" + atmos + "_" + season + "_" + keyword + "\n"
-            domain_flux_pbs[18] = "python " + code_dir + "MATHAM_domain_flux.py -i /scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos + "/MATHAM_"+season+"_netCDF_MOV.nc -o " + GCM_datadir + '/' + volc_name + "_" + season + "_" + atmos + "_" + keyword + ".txt\n"
+            domain_flux_pbs[18] = "python " + code_dir + "MATHAM_domain_flux.py -i "+ out_dir + keyword + '_' + volc_name + "_" + atmos + "/MATHAM_"+season+"_netCDF_MOV.nc -o " + GCM_datadir + '/' + volc_name + "_" + season + "_" + atmos + "_" + keyword + ".txt\n"
             
             file = open("domain_flux_"+ volc_name + "_" + atmos + "_" + season + ".pbs","w")
             file.writelines(domain_flux_pbs)
@@ -137,18 +140,18 @@ for volc_name in volc_df['Volcano Name']:
                 os.mkdir("input")
                 shutil.copy2(MATHAM_dir +'/input/INPUT_kinetic',current_dir+"/input/INPUT_kinetic")
 
-                shutil.copy2(os.path.join(code_dir,'nc_volc_filt.pbs'),current_dir+"/nc_volc_filt_"+ volc_name + "_" + atmos + ".pbs")
+                shutil.copy2(os.path.join(pbs_dir,'nc_volc_filt.pbs'),current_dir+"/nc_volc_filt_"+ volc_name + "_" + atmos + ".pbs")
                 file = open("nc_volc_filt_"+ volc_name + "_" + atmos + ".pbs","r")
                 nc_volc_filt_pbs = file.readlines()
 
                 nc_volc_filt_pbs[4] = "#PBS -N nc_volc_filt_" + volc_name + "_" + atmos + "_" + keyword + "\n"
-                nc_volc_filt_pbs[18] = "python " + code_dir +  "nc_volc_filt.py -i /scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos + "/" + "diagfi.nc -o /scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos + "/" + volc_name+ "_diagfi_volc_filt.nc\n"
+                nc_volc_filt_pbs[18] = "python " + code_dir +  "nc_volc_filt.py -i " + out_dir + keyword + '_' + volc_name + "_" + atmos + "/" + "diagfi.nc -o /scratch/palatyle/" + keyword + '_' + volc_name + "_" + atmos + "/" + volc_name+ "_diagfi_volc_filt.nc\n"
                 
                 file = open("nc_volc_filt_"+ volc_name + "_" + atmos + ".pbs","w")
                 file.writelines(nc_volc_filt_pbs)
                 file.close()
 
-            # Pbs chain edits
+            # Construct pbs chain shell script 
             if season == "winter":
                 shutil.copy2(os.path.join(code_dir,'pbs_chain_template.sh'),current_dir+"/pbs_chain_"+ volc_name + "_" + atmos + ".sh")
                 file = open("pbs_chain_"+ volc_name + "_" + atmos + ".sh","r")
