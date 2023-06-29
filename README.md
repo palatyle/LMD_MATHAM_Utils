@@ -8,7 +8,7 @@
 
 `GWR_output_summary.xlsx` -- Excel file containing major output from GWR analysis done in Arc as well as some plots.
 
-`GWER_project.ppkx` -- ArcGIS Pro Project Package containing raw and transformed GCM output as well as all GWR analyses. 
+`GWR_project.ppkx` -- ArcGIS Pro Project Package containing raw and transformed GCM output as well as all GWR analyses. 
 
 `LMD_interp.py` -- Script to interpolate model output from the PCM to the resolution and extent of the GRS H<sub>2</sub>O data. This script will loop through all output from the coupled PCM-MATHAM models and output geopackages. 
 

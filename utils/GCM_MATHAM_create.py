@@ -6,9 +6,10 @@ import pandas as pd
 
 # -Define directories
 main_GCM_dir = '/home/palatyle/LMD_gen/trunk/cold_dry_no_tharsis/'
+GCM_datadir = '/home/palatyle/LMD_gen/trunk/datadir'
 MATHAM_dir = '/home/palatyle/P_MATHAM/'
 code_dir = os.getcwd() # '/home/palatyle/LMD_MATHAM_Utils/'
-GCM_datadir = '/home/palatyle/LMD_gen/trunk/datadir'
+
 
 # Volcano names filename
 volc_fn = '/home/palatyle/GCM2MATHAM/Mars_Volc_locs.csv'

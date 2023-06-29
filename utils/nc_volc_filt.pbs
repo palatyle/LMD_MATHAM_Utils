@@ -2,7 +2,7 @@
 #PBS -j oe
 #PBS -k doe
 
-#PBS -N domain_flux_Hadriaca_Patera_cold_dry_fall
+#PBS -N nc_volc_filt_Hadriaca_Patera_cold_dry_fall
 #PBS -m abe
 #PBS -M palatyle@isu.edu
 #PBS -l select=1:mem=150gb
@@ -17,5 +17,5 @@ source /etc/profile.d/modules.sh
 module load python/3.8-anaconda-2020.07
 conda activate GCM2MATHAM
 
-python MATHAM_domain_flux.py -i /scratch/palatyle/Hadriaca_Patera_cold_dry/MATHAM_fall_netCDF_MOV.nc -o /home/palatyle/LMD_gen/trunk/datagcm/Hadriaca_Patera_fall_cold_dry.txt
+python /home/palatyle/LMD_MATHAM_Utils/nc_volc_filt.py -i /scratch/palatyle/no_tharsis_Alba_Patera_cold_dry/diagfi.nc -o /scratch/palatyle/no_tharsis_Alba_Patera_cold_dry/Alba_Patera_diagfi_volc_filt.nc
 
