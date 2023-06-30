@@ -55,6 +55,9 @@ The general order of operations for this work are:
 
 ## Data files
 
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8102490.svg)](https://doi.org/10.5281/zenodo.8102490) -- Sensitivty tests output. Used in `utils/Sensitivity_tests_viz.py`
+
 `data/DCI_raster_reproj.tif` -- Dust Cover index raster originally sourced from Ruff and Christensen (2002) and reprojected.
 
 `data/GRS_data_S_180.csv` -- CSV containing GRS Sulfur data with the convention changed to -180 to 180. Data originally from Rani et al. (2022).
