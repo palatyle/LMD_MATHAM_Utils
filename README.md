@@ -2,7 +2,7 @@
 
 This repository contains all necessary scripts, input files, and data files for recreating the analysis done in Paladino et al. (2023). It is recommended to create an conda environment first using the provided `environment.txt` file:
 
-`conda create --name env_name --file environment.txt`
+`conda env create -name env_name --file environment.txt`
 
 Note that this work depends on two separate models: the Generic PCM and ATHAM. The Generic PCM can be downloaded and installed from [here](http://www-planets.lmd.jussieu.fr/). I've made fairly significant edits to parts of the Generic PCM to allow volcanic ash tracer tracking as well as just playing friendly with ATHAM. This modified code is available at this separate [GitHub repository](https://github.com/palatyle/LMD_GCM_Paladino). I would recommend installing the Generic PCM first and making sure that it works, then making edits to the codes indicated in the readme of my GitHub repo linked above. 
 
@@ -29,7 +29,9 @@ The general order of operations for this work are:
 
 `utils/Sensitivity_setup.py` -- Essentially the same as `utils/GCM_MATHAM_create.py`, but creates directories for sensitivity tests. 
 
-`utils/Sensitivity_tests_viz.py` -- scripts to visualize the output from sensitivity tests.
+`utils/Sensitivity_tests_viz.py` -- script to visualize the output from sensitivity tests.
+
+`utils/Surface_p_comp.py` -- Compares surface pressure of ancient vs modern Mars. Creates Figure 3.  
 
 `utils/batch_start.sh` -- shell script to be placed in the same directory as the generated volcano directories. Will loop through each volcano folder and begin the model runs. 
 
