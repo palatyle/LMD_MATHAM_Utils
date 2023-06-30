@@ -1,12 +1,12 @@
 # LMD_MATHAM_Utils
 
-This repository contains all necessary scripts, input files, and data files for recreating the analysis done in Paladino et al. (2023). It is recommended to create an conda environment first using the provided `environment.txt` file:
+This repository contains all necessary scripts, input files, and data files for recreating the analysis done in Paladino et al. (2023). It is recommended to create a conda environment first using the provided `environment.txt` file:
 
 `conda env create -name env_name --file environment.txt`
 
 Note that this work depends on two separate models: the Generic PCM and ATHAM. The Generic PCM can be downloaded and installed from [here](http://www-planets.lmd.jussieu.fr/). I've made fairly significant edits to parts of the Generic PCM to allow volcanic ash tracer tracking as well as just playing friendly with ATHAM. This modified code is available at this separate [GitHub repository](https://github.com/palatyle/LMD_GCM_Paladino). I would recommend installing the Generic PCM first and making sure that it works, then making edits to the codes indicated in the readme of my GitHub repo linked above. 
 
-ATHAM must be requested from one of the authors, Michael Herzog. I've since made some small quality of life edits to ATHAM (referred to now as MATHAM - Mars ATHAM) as well as edits to make it work on Mars (also small). If you end up trying to recreate what I've done, please contact me and I'd be happy to help.
+ATHAM must be requested from one of the authors, Michael Herzog. I've since made some small quality of life edits to ATHAM (referred to now as MATHAM - Mars ATHAM) as well as edits to make it work on Mars (also small). If you have ATHAM installed and end up trying to recreate what I've done, please contact me and I'd be happy to help.
 
 The general order of operations for this work are:
 
