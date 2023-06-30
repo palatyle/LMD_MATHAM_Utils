@@ -63,6 +63,9 @@ The general order of operations for this work are:
 
 `data/Mars_Volc_locs.csv` -- CSV containing all major potentially explosive volcanoes on Mars as well as their lat/lon coordinates. Originally from Kerber et al. (2012) and subsequently augmented.
 
+`data/no_tharsis.` -- this directory mostly contains the interpolated ash deposition maps for the analysis done in the paper. Each of these outputs is separated by volcano location as well as tracer. They are in `.npy` format and can be read in easily with numpy (`np.load(file.npy)`)
+
+In this directory, you'll also find two matlab binary files (`.mat`). `PCM_geo.mat` contains geometry information, while `ps_tharsis_no_tharsis.mat` contains surface pressure information. Both of these files are used in the `Surface_p_comp.py` script. 
 ## Model Inputs
     P_MATHAM/ 
     ├── IO_ref/ -- Contains MATHAM input files generated in `GCM2MATHAM.py`
