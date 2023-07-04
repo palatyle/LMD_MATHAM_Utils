@@ -55,7 +55,7 @@ The general order of operations for this work are:
 
 ## Data files
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8114833.svg)](https://doi.org/10.5281/zenodo.8114833) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8114972.svg)](https://doi.org/10.5281/zenodo.8114972) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8115051.svg)](https://doi.org/10.5281/zenodo.8115051) -- Set 1-3 of compressed PCM netCDF output for each volcano hosted on Zenodo. Used in `LMD_interp.py`
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8114833.svg)](https://doi.org/10.5281/zenodo.8114833) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8114972.svg)](https://doi.org/10.5281/zenodo.8114972) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8115051.svg)](https://doi.org/10.5281/zenodo.8115051) -- Set 1-3 of compressed PCM netCDF output for each volcano hosted on Zenodo. Used in `utils/LMD_interp.py`
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8102490.svg)](https://doi.org/10.5281/zenodo.8102490) --Sensitivty tests netCDF output hosted on Zenodo. Used in `utils/Sensitivity_tests_viz.py`
 
